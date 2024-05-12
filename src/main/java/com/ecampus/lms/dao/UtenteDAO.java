@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface UtenteDAO extends JpaRepository<Utente, Integer> {
     @Query("select u from Utente u where u.ruolo = ?1")
     Page<Utente> findByRole(@NonNull UserRole ruolo, Pageable pageable);
 
     boolean existsByCodiceFiscale(String codiceFiscale);
+
+    Optional<Utente> findByEmail(String email);
 
 }

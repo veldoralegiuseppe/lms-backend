@@ -5,8 +5,6 @@ import com.ecampus.lms.dto.request.UtenteRequest;
 import com.ecampus.lms.entity.Utente;
 import com.ecampus.lms.enums.UserRole;
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.TypedQuery;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,5 +56,10 @@ public class UtenteServiceImpl implements UtenteService{
     @Override
     public Optional<Utente> findById(Integer id) {
         return dao.findById(id);
+    }
+
+    @Override
+    public Optional<Utente> findByEmail(String email) {
+        return dao.findByEmail(email);
     }
 }
