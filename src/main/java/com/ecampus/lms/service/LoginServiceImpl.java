@@ -30,7 +30,7 @@ public class LoginServiceImpl implements LoginService{
             throw new BadCredentialsException("utente: '" + username + "' non trovato");
         });
 
-        if(!utente.getPassword().equals("admin") && !passwordEncoder.matches(password, utente.getPassword()))
+        if(!passwordEncoder.matches(password, utente.getPassword()))
             throw new BadCredentialsException("credenziali di accesso errate");
 
         final String token = jwtService.buildJwt(username, utente.getRuolo(), utente.getNome(), utente.getCognome(), utente.getCodiceFiscale());
