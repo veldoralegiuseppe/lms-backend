@@ -30,6 +30,10 @@ public class Utente {
     private String cognome;
 
     @NotNull
+    @Column(name = "\"DUTNE_PASSWORD\"", nullable = false, length = Integer.MAX_VALUE)
+    private String password;
+
+    @NotNull
     @Column(name = "\"DUTNE_EMAIL\"", nullable = false, length = Integer.MAX_VALUE)
     private String email;
 

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class UtenteServiceImpl implements UtenteService{
 
     private final UtenteDAO dao;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -40,6 +42,12 @@ public class UtenteServiceImpl implements UtenteService{
     public Utente create(UtenteRequest request) {
 
         final String codiceFiscale = request.codiceFiscale();
+        final String username = request.email();
+
+        if(dao.existsByEmailIgnoreCase(username)){
+            log.error("create() - utente con email: {} già presente in DUTNE_UTENTE", username);
+            throw new EntityExistsException("email: " + username+ " è gia censita nel database");
+        }
 
         if(dao.existsByCodiceFiscale(codiceFiscale)){
             log.error("create() - utente con codice fiscale: {} già presente in DUTNE_UTENTE", codiceFiscale);
@@ -54,6 +62,7 @@ public class UtenteServiceImpl implements UtenteService{
         utente.setCodiceFiscale(request.codiceFiscale());
         utente.setEmail(request.email());
         utente.setRuolo(request.ruolo());
+        utente.setPassword(passwordEncoder.encode(request.password()));
 
         return dao.save(utente);
     }

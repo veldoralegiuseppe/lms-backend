@@ -35,12 +35,14 @@ public class JwtService {
     public String buildJwt(final String username,
                            final UserRole role,
                            final String nome,
-                           final String cognome){
+                           final String cognome,
+                           final String cf){
         return JWT.create()
                 .withSubject(username)
                 .withClaim("ruolo", role.name())
                 .withClaim("nome", nome)
                 .withClaim("cognome", cognome)
+                .withClaim("cf", cf)
                 .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(tokenExpirationAfterDays)))
                 .sign(algorithm);
     }
