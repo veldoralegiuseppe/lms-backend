@@ -6,6 +6,7 @@ import com.ecampus.lms.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UtenteService {
@@ -18,4 +19,6 @@ public interface UtenteService {
     Optional<Utente> findById(Integer id);
 
     Optional<Utente> findByEmail(String email);
+
+    List<Utente> findAll();
 }

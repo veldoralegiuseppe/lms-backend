@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -24,6 +25,10 @@ public class UtenteServiceImpl implements UtenteService{
     @Override
     public Page<Utente> findAll(Pageable pageable) {
         return dao.findAll(pageable);
+    }
+
+    public List<Utente> findAll(){
+        return dao.findAll();
     }
 
     @Override

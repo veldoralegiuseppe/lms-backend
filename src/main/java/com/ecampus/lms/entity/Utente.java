@@ -16,7 +16,8 @@ import lombok.Setter;
 })
 public class Utente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "DUTNE_PK_ID_GENERATOR", sequenceName = "\"DUTNE_PK_ID_GENERATOR\"", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DUTNE_PK_ID_GENERATOR")
     @Column(name = "\"DUTNE_PK_ID\"", nullable = false)
     private Integer id;
 

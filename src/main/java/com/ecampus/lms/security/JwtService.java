@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class JwtService {
-    @Value("${config.jwt.secret_key}")
+    @Value("${config.app.jwt.secret_key}")
     private String secretKey;
 
-    @Value("${config.jwt.token_prefix}")
+    @Value("${config.app.jwt.token_prefix}")
     @Getter
     private String tokenPrefix;
 
-    @Value("${config.jwt.token_expiration_after_days}")
+    @Value("${config.app.jwt.token_expiration_after_days}")
     private Integer tokenExpirationAfterDays;
 
     private Algorithm algorithm;
