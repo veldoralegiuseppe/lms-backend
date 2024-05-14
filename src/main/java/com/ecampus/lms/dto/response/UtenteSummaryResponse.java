@@ -1,6 +1,6 @@
 package com.ecampus.lms.dto.response;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
-public record UtenteSummaryResponse(Integer idUtente, List<SummaryDTO> summaries) {
+public record UtenteSummaryResponse(Page<SummaryDTO> summaries) {
 }

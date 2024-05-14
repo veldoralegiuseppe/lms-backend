@@ -1,11 +1,9 @@
 package com.ecampus.lms.service;
 
-import com.ecampus.lms.dto.response.SummaryDTO;
 import com.ecampus.lms.dto.response.UtenteSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface CorsoService {
 
-    UtenteSummaryResponse getStudenteSummary(Integer idStudente);
+    UtenteSummaryResponse getSummary(Pageable pageable);
 }

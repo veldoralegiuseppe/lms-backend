@@ -8,17 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"DATTV_ATTIVITA\"")
+@Table(name = "\"DATTV_ATTIVITA\"", schema = "public")
 public class AttivitaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DATTV_PK_ID_GENERATOR")
-    @SequenceGenerator(name = "DATTV_PK_ID_GENERATOR", sequenceName = "DATTV_PK_ID_GENERATOR", allocationSize = 1)
+    @SequenceGenerator(name = "DATTV_PK_ID_GENERATOR", sequenceName = "\"DATTV_PK_ID_GENERATOR\"", allocationSize = 1)
     @Column(name = "\"DATTV_PK_ID\"", nullable = false)
     private Integer id;
-
-    @NotNull
-    @Column(name = "\"DATTV_FK_DMODL\"", nullable = false)
-    private Integer fkModulo;
 
     @NotNull
     @Column(name = "\"DATTV_NOME\"", nullable = false, length = Integer.MAX_VALUE)
@@ -28,7 +24,7 @@ public class AttivitaEntity {
     private String descrizione;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DATTV_FK_DMODL")
+    @JoinColumn(name = "\"DATTV_FK_DMODL\"")
     private ModuloEntity modulo;
 
 }

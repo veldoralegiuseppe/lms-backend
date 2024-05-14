@@ -7,15 +7,11 @@ import com.ecampus.lms.service.LoginService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,10 +32,8 @@ public class LoginController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(final Authentication authentication){
-
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
         final String token = details.token();
-
         loginService.logout(token);
 
         return ResponseEntity.ok().build();

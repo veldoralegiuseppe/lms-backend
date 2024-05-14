@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"DUTNE_UTENTE\"")
+@Table(name = "\"DUTNE_UTENTE\"", schema = "public")
 @NamedQueries({
         @NamedQuery(name = "findByRole", query = "SELECT u FROM UtenteEntity u WHERE u.ruolo = :role"),
 })

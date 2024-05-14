@@ -11,11 +11,11 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"DCORS_CORSO\"")
+@Table(name = "\"DCORS_CORSO\"", schema = "public")
 public class CorsoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DCORS_PK_ID_GENERATOR")
-    @SequenceGenerator(name = "DCORS_PK_ID_GENERATOR", sequenceName = "DCORS_PK_ID_GENERATOR", allocationSize = 1)
+    @SequenceGenerator(name = "DCORS_PK_ID_GENERATOR", sequenceName = "\"DCORS_PK_ID_GENERATOR\"", allocationSize = 1)
     @Column(name = "\"DCORS_PK_ID\"", nullable = false)
     private Integer id;
 
@@ -36,9 +36,9 @@ public class CorsoEntity {
     private Set<SessioneEntity> sessioni = new LinkedHashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "RCRST_CORSO_STUDENTE",
-            joinColumns = @JoinColumn(name = "RCRST_FK_DCORS"),
-            inverseJoinColumns = @JoinColumn(name = "RCRST_FK_DUTNE"))
+    @JoinTable(name = "\"RCRST_CORSO_STUDENTE\"",
+            joinColumns = @JoinColumn(name = "\"RCRST_FK_DCORS\""),
+            inverseJoinColumns = @JoinColumn(name = "\"RCRST_FK_DUTNE\""))
     private Set<UtenteEntity> studenti = new LinkedHashSet<>();
 
 }

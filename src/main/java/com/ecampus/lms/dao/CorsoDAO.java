@@ -1,43 +1,63 @@
 package com.ecampus.lms.dao;
 
 import com.ecampus.lms.entity.CorsoEntity;
+import com.ecampus.lms.enums.UserRole;
 import jakarta.persistence.Tuple;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface CorsoDAO extends JpaRepository<CorsoEntity, Integer> {
     @Query(value = """
-    SELECT
-    "DCORS_NOME" AS "NOME_CORSO",
+    SELECT\s
+    c.nome as NOME_CORSO,
     (
-        SELECT COUNT(*)
-        FROM "DCORS_CORSO"
-        JOIN "DSECR_SESSIONE" ON "DSECR_FK_DCORS" = "DCORS_PK_ID"
-        GROUP BY "DCORS_NOME"
-    ) AS "NUMERO_SESSIONI",
+        SELECT COUNT(cr)
+    	FROM CorsoEntity cr JOIN cr.sessioni
+    	GROUP BY cr.nome
+    ) AS NUMERO_SESSIONI,
     (
-        SELECT COUNT(*)
-        FROM "DCORS_CORSO"
-        JOIN "DMODL_MODULO" ON "DMODL_FK_DCORS" = "DCORS_PK_ID"
-        GROUP BY "DCORS_NOME"
-    ) AS "NUMERO_MODULI",
+        SELECT COUNT(cr)
+    	FROM CorsoEntity cr JOIN cr.moduli
+    	GROUP BY cr.nome
+    ) AS NUMERO_MODULI,
     (
-        SELECT COUNT(*)
-        FROM "DCORS_CORSO"
-        JOIN "RCRST_CORSO_STUDENTE" ON "RCRST_FK_DCORS" = "DCORS_PK_ID"
-        GROUP BY "DCORS_NOME"
-    ) AS "NUMERO_STUDENTI"
-    FROM "DCORS_CORSO"
-    WHERE "DCORS_PK_ID" IN (
-        SELECT "DCORS_PK_ID"
-        FROM "DCORS_CORSO" JOIN "RCRST_CORSO_STUDENTE" ON "RCRST_FK_DCORS" = "DCORS_PK_ID"
-        WHERE "RCRST_FK_DUTNE" = :idStudente
-    )
-    GROUP BY "DCORS_NOME"
-    """, nativeQuery = true)
-    List<Tuple> findStudenteSummary(@Param("idStudente") Integer idStudente);
+        SELECT COUNT(cr)
+    	FROM CorsoEntity cr JOIN cr.studenti
+    	GROUP BY cr.nome
+    ) AS NUMERO_STUDENTI
+    FROM CorsoEntity c
+    WHERE c.id IN (
+        CASE
+            WHEN :ruolo = 'STUDENTE' THEN (
+                    SELECT c.id
+                    FROM CorsoEntity c JOIN c.studenti s
+                    WHERE s.id = (
+                        SELECT u.id
+                        FROM UtenteEntity u
+                        WHERE u.ruolo = :ruolo AND u.email = :email
+                    )
+            )
+            WHEN :ruolo = 'DOCENTE' THEN (
+                SELECT cr.id
+                FROM CorsoEntity cr
+                WHERE cr.fkProfessore = (
+                    SELECT u.id
+                    FROM UtenteEntity u
+                    WHERE u.ruolo = :ruolo AND u.email = :email
+                )
+            )
+            WHEN :ruolo = 'ADMIN' THEN (
+                SELECT cr.id
+                FROM CorsoEntity cr
+            )
+            ELSE 0
+        END
+     )
+     GROUP BY c.nome         
+    """, nativeQuery = false)
+    Page<Tuple> findSummary(@Param("ruolo") UserRole role, @Param("email") String email, Pageable pageable);
 
 }
