@@ -1,7 +1,7 @@
 package com.ecampus.lms.service;
 
 import com.ecampus.lms.dto.request.CredentialsRequest;
-import com.ecampus.lms.entity.Utente;
+import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +25,15 @@ public class LoginServiceImpl implements LoginService{
         final String username = credentials.username();
         final String password = credentials.password();
 
-        final Utente utente = utenteService.findByEmail(username).orElseThrow(() -> {
+        final UtenteEntity utenteEntity = utenteService.findByEmail(username).orElseThrow(() -> {
             log.error("utente: '{}' non presente in tabella Utente", username);
             throw new BadCredentialsException("utente: '" + username + "' non trovato");
         });
 
-        if(!passwordEncoder.matches(password, utente.getPassword()))
+        if(!passwordEncoder.matches(password, utenteEntity.getPassword()))
             throw new BadCredentialsException("credenziali di accesso errate");
 
-        final String token = jwtService.buildJwt(username, utente.getRuolo(), utente.getNome(), utente.getCognome(), utente.getCodiceFiscale());
+        final String token = jwtService.buildJwt(username, utenteEntity.getRuolo(), utenteEntity.getNome(), utenteEntity.getCognome(), utenteEntity.getCodiceFiscale());
         log.info("utente: '{}' ha effettuato l'accesso", username);
 
         return token;

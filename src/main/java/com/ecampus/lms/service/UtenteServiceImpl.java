@@ -2,7 +2,7 @@ package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.UtenteDAO;
 import com.ecampus.lms.dto.request.UtenteRequest;
-import com.ecampus.lms.entity.Utente;
+import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
@@ -25,21 +25,21 @@ public class UtenteServiceImpl implements UtenteService{
 
 
     @Override
-    public Page<Utente> findAll(Pageable pageable) {
+    public Page<UtenteEntity> findAll(Pageable pageable) {
         return dao.findAll(pageable);
     }
 
-    public List<Utente> findAll(){
+    public List<UtenteEntity> findAll(){
         return dao.findAll();
     }
 
     @Override
-    public Page<Utente> findByRole(UserRole role, Pageable pageable) {
+    public Page<UtenteEntity> findByRole(UserRole role, Pageable pageable) {
         return dao.findByRole(UserRole.STUDENTE, pageable);
     }
 
     @Override
-    public Utente create(UtenteRequest request) {
+    public UtenteEntity create(UtenteRequest request) {
 
         final String codiceFiscale = request.codiceFiscale();
         final String username = request.email();
@@ -56,24 +56,24 @@ public class UtenteServiceImpl implements UtenteService{
 
         log.info("create() - inserimento utente: {}", codiceFiscale);
 
-        final Utente utente = new Utente();
-        utente.setNome(request.nome());
-        utente.setCognome(request.cognome());
-        utente.setCodiceFiscale(request.codiceFiscale());
-        utente.setEmail(request.email());
-        utente.setRuolo(request.ruolo());
-        utente.setPassword(passwordEncoder.encode(request.password()));
+        final UtenteEntity utenteEntity = new UtenteEntity();
+        utenteEntity.setNome(request.nome());
+        utenteEntity.setCognome(request.cognome());
+        utenteEntity.setCodiceFiscale(request.codiceFiscale());
+        utenteEntity.setEmail(request.email());
+        utenteEntity.setRuolo(request.ruolo());
+        utenteEntity.setPassword(passwordEncoder.encode(request.password()));
 
-        return dao.save(utente);
+        return dao.save(utenteEntity);
     }
 
     @Override
-    public Optional<Utente> findById(Integer id) {
+    public Optional<UtenteEntity> findById(Integer id) {
         return dao.findById(id);
     }
 
     @Override
-    public Optional<Utente> findByEmail(String email) {
+    public Optional<UtenteEntity> findByEmail(String email) {
         return dao.findByEmail(email);
     }
 }

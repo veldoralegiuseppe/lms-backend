@@ -12,9 +12,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "\"DUTNE_UTENTE\"")
 @NamedQueries({
-        @NamedQuery(name = "findByRole", query = "SELECT u FROM Utente u WHERE u.ruolo = :role"),
+        @NamedQuery(name = "findByRole", query = "SELECT u FROM UtenteEntity u WHERE u.ruolo = :role"),
 })
-public class Utente {
+public class UtenteEntity {
     @Id
     @SequenceGenerator(name = "DUTNE_PK_ID_GENERATOR", sequenceName = "\"DUTNE_PK_ID_GENERATOR\"", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DUTNE_PK_ID_GENERATOR")
