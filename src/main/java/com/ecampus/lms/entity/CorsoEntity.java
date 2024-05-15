@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,9 +27,6 @@ public class CorsoEntity {
     @Column(name = "\"DCORS_DESCRIZIONE\"", length = Integer.MAX_VALUE)
     private String descrizione;
 
-    @Column(name = "\"DCORS_FK_DUTNE\"")
-    private Integer fkProfessore;
-
     @OneToMany(mappedBy = "corso")
     private Set<ModuloEntity> moduli = new LinkedHashSet<>();
 
@@ -40,5 +38,10 @@ public class CorsoEntity {
             joinColumns = @JoinColumn(name = "\"RCRST_FK_DCORS\""),
             inverseJoinColumns = @JoinColumn(name = "\"RCRST_FK_DUTNE\""))
     private Set<UtenteEntity> studenti = new LinkedHashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "\"DCORS_FK_DUTNE\"")
+    @SQLRestriction("ruolo = 'DOCENTE'")
+    private UtenteEntity docente;
 
 }

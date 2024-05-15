@@ -3,7 +3,6 @@ package com.ecampus.lms.service;
 import com.ecampus.lms.dao.AttivitaDAO;
 import com.ecampus.lms.dto.response.AttivitaSummaryDTO;
 import com.ecampus.lms.dto.response.AttivitaSummaryResponse;
-import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.entity.AttivitaEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
@@ -19,12 +18,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AttivitaServiceImpl implements AttivitaService{
+public class AttivitaServiceImpl implements AttivitaService {
 
     private final AttivitaDAO dao;
 
     @Override
-    public AttivitaSummaryResponse getStudenteSummary(Pageable pageable) {
+    public AttivitaSummaryResponse getAttivitaStudente(Pageable pageable) {
         final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
         final UserRole role = details.role();
@@ -35,7 +34,7 @@ public class AttivitaServiceImpl implements AttivitaService{
         return new AttivitaSummaryResponse(summaries);
     }
 
-    private AttivitaSummaryDTO mappingToResponse(Tuple tuple){
+    private AttivitaSummaryDTO mappingToResponse(Tuple tuple) {
         final AttivitaEntity attivita = tuple.get("ATTIVITA", AttivitaEntity.class);
         final String nomeCorso = tuple.get("NOME_CORSO", String.class);
 

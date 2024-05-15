@@ -1,7 +1,6 @@
 package com.ecampus.lms.controller;
 
 import com.ecampus.lms.dto.response.AttivitaSummaryResponse;
-import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeStudente;
 import com.ecampus.lms.service.AttivitaService;
@@ -29,10 +28,10 @@ public class AttivitaController {
     @GetMapping("/summary/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo delle attivita dello studente")
     @PreAuthorizeStudente
-    public ResponseEntity<AttivitaSummaryResponse> getStudenteSummary(@Parameter(description = "Numero di pagina richiesto")
+    public ResponseEntity<AttivitaSummaryResponse> getAttivitaStudente(@Parameter(description = "Numero di pagina richiesto")
                                                                       @PathVariable @Min(0) int page,
                                                                       @Parameter(description = "Numero di elementi richiesti")
                                                                       @PathVariable @Min(1) int size){
-        return ResponseEntity.ok(service.getStudenteSummary(PageRequest.of(page, size)));
+        return ResponseEntity.ok(service.getAttivitaStudente(PageRequest.of(page, size)));
     }
 }
