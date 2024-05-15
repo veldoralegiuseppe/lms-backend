@@ -16,15 +16,19 @@ public class AttivitaEntity {
     @Column(name = "\"DATTV_PK_ID\"", nullable = false)
     private Integer id;
 
-    @NotNull
-    @Column(name = "\"DATTV_NOME\"", nullable = false, length = Integer.MAX_VALUE)
-    private String nome;
-
     @Column(name = "\"DATTV_DESCRIZIONE\"", length = Integer.MAX_VALUE)
     private String descrizione;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DATTV_FK_DMODL\"")
     private ModuloEntity modulo;
+
+    @NotNull
+    @Column(name = "\"DATTV_TIPO\"", nullable = false, length = Integer.MAX_VALUE)
+    private String tipo;
+
+    @NotNull
+    @Column(name = "\"DATTV_SETTIMANA_PROGRAMMATA\"", nullable = false, length = Integer.MAX_VALUE)
+    private String settimanaProgrammata;
 
 }

@@ -26,4 +26,8 @@ public class SessioneEntity {
     @JoinColumn(name = "\"DSECR_FK_DCORS\"")
     private CorsoEntity corso;
 
+    @NotNull
+    @Column(name = "\"DSECR_TIPO\"", nullable = false, length = Integer.MAX_VALUE)
+    private String tipo;
+
 }

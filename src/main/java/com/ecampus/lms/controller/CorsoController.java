@@ -1,6 +1,6 @@
 package com.ecampus.lms.controller;
 
-import com.ecampus.lms.dto.response.UtenteSummaryResponse;
+import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.service.CorsoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,9 +26,9 @@ public class CorsoController {
 
     @GetMapping("/summary/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo corsi/moduli/sessioni/studenti in funzione del ruolo")
-    public ResponseEntity<UtenteSummaryResponse> getSummary(@Parameter(description = "Numero di pagina richiesto")
+    public ResponseEntity<CorsoSummaryResponse> getSummary(@Parameter(description = "Numero di pagina richiesto")
                                                             @PathVariable @Min(0) int page,
-                                                            @Parameter(description = "Numero di elementi richiesti")
+                                                           @Parameter(description = "Numero di elementi richiesti")
                                                             @PathVariable @Min(1) int size){
         return ResponseEntity.ok(service.getSummary(PageRequest.of(page, size)));
     }
