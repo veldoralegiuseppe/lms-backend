@@ -41,7 +41,6 @@ public class CorsoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DCORS_FK_DUTNE\"")
-    @SQLRestriction("ruolo = 'DOCENTE'")
     private UtenteEntity docente;
 
 }

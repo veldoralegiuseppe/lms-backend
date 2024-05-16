@@ -28,33 +28,12 @@ public class SessioneController {
 
     private final SessioneService service;
 
-    @GetMapping("/summary/{size}/{page}")
+    @GetMapping("/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo delle sessioni relative allo studente")
-    @PreAuthorizeStudente
-    public ResponseEntity<Page<SessioneDTO>> getSessioniStudente(@Parameter(description = "Numero di pagina richiesto")
+    public ResponseEntity<Page<SessioneDTO>> getSessioni(@Parameter(description = "Numero di pagina richiesto")
                                                                  @PathVariable @Min(0) int page,
                                                                  @Parameter(description = "Numero di elementi richiesti")
                                                                  @PathVariable @Min(1) int size) {
-        return ResponseEntity.ok(service.getSessioniStudente(PageRequest.of(page, size)));
-    }
-
-    @GetMapping("/summary/{size}/{page}")
-    @Operation(summary = "Restituisce il riepilogo delle sessioni relative al docente")
-    @PreAuthorizeDocente
-    public ResponseEntity<Page<SessioneDTO>> getSessioniDocente(@Parameter(description = "Numero di pagina richiesto")
-                                                                @PathVariable @Min(0) int page,
-                                                                @Parameter(description = "Numero di elementi richiesti")
-                                                                @PathVariable @Min(1) int size) {
-        return ResponseEntity.ok(service.getSessioniDocente(PageRequest.of(page, size)));
-    }
-
-    @GetMapping("/summary/{size}/{page}")
-    @Operation(summary = "Restituisce il riepilogo di tutte le sessioni")
-    @PreAuthorizeAdmin
-    public ResponseEntity<Page<SessioneDTO>> getSessioni(@Parameter(description = "Numero di pagina richiesto")
-                                                         @PathVariable @Min(0) int page,
-                                                         @Parameter(description = "Numero di elementi richiesti")
-                                                         @PathVariable @Min(1) int size) {
         return ResponseEntity.ok(service.getSessioni(PageRequest.of(page, size)));
     }
 }

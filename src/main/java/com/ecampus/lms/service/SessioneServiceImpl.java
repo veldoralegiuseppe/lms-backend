@@ -3,6 +3,7 @@ package com.ecampus.lms.service;
 import com.ecampus.lms.dao.SessioneDAO;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.entity.SessioneEntity;
+import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
@@ -20,28 +21,19 @@ public class SessioneServiceImpl implements SessioneService{
 
     private final SessioneDAO dao;
 
-
-    @Override
-    public Page<SessioneDTO> getSessioniStudente(Pageable pageable) {
-        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
-        final String email = details.username();
-
-        return dao.getSessioniStudente(email, pageable).map(this::mapToResponse);
-    }
-
-    @Override
-    public Page<SessioneDTO> getSessioniDocente(Pageable pageable) {
-        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
-        final String email = details.username();
-
-        return dao.getSessioniDocente(email, pageable).map(this::mapToResponse);
-    }
-
     @Override
     public Page<SessioneDTO> getSessioni(Pageable pageable) {
-        return dao.getSessioni(pageable).map(this::mapToResponse);
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username();
+        final UserRole role = details.role();
+
+        switch(role){
+            case STUDENTE -> { return dao.getSessioniStudente(email, pageable).map(this::mapToResponse); }
+            case DOCENTE -> { return dao.getSessioniDocente(email, pageable).map(this::mapToResponse); }
+            case ADMIN -> { return dao.getSessioni(pageable).map(this::mapToResponse); }
+            default -> { return null;}
+        }
     }
 
     private SessioneDTO mapToResponse(Tuple tuple){

@@ -25,7 +25,7 @@ public class AttivitaController {
 
     private final AttivitaService service;
 
-    @GetMapping("/summary/{size}/{page}")
+    @GetMapping("/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo delle attivita dello studente")
     @PreAuthorizeStudente
     public ResponseEntity<AttivitaSummaryResponse> getAttivitaStudente(@Parameter(description = "Numero di pagina richiesto")
