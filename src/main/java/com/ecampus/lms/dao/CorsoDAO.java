@@ -9,5 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface CorsoDAO extends JpaRepository<CorsoEntity, Integer> {
+    @Query("""
+    SELECT c.nome
+    FROM CorsoEntity c
+    """)
+    List<String> getAllNomeCorsi();
 }

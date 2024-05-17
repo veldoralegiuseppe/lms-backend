@@ -14,6 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -37,10 +39,13 @@ public class SessioneServiceImpl implements SessioneService{
     }
 
     private SessioneDTO mapToResponse(Tuple tuple){
+        final String dateTimePattern = "dd/MM/yyyy HH:mm";
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+
         final String nomeCorso = tuple.get("NOME_CORSO", String.class);
         final SessioneEntity sessione = tuple.get("SESSIONE", SessioneEntity.class);
 
-        return new SessioneDTO(nomeCorso, sessione.getDataOra(), sessione.getTipo());
+        return new SessioneDTO(nomeCorso, sessione.getDataOra().format(dateTimeFormatter), sessione.getTipo());
 
     }
 }

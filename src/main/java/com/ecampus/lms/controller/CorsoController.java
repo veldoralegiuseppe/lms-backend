@@ -1,5 +1,6 @@
 package com.ecampus.lms.controller;
 
+import com.ecampus.lms.dto.response.CorsoDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.service.CorsoService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/corso")
@@ -31,5 +34,11 @@ public class CorsoController {
                                                            @Parameter(description = "Numero di elementi richiesti")
                                                             @PathVariable @Min(1) int size){
         return ResponseEntity.ok(service.getSummary(PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/list/nome")
+    @Operation(summary = "Restituisce i nomi di tutti i corsi")
+    public ResponseEntity<List<CorsoDTO>> getAllNomeCorsi(){
+        return ResponseEntity.ok(service.getAllNomeCorsi());
     }
 }

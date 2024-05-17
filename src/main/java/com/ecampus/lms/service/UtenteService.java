@@ -1,6 +1,8 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dto.request.SearchUtenteRequest;
 import com.ecampus.lms.dto.request.UtenteRequest;
+import com.ecampus.lms.dto.response.UtenteDTO;
 import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import org.springframework.data.domain.Page;
@@ -21,4 +23,6 @@ public interface UtenteService {
     Optional<UtenteEntity> findByEmail(String email);
 
     List<UtenteEntity> findAll();
+
+    Page<UtenteDTO> searchBy(SearchUtenteRequest request, Pageable pageable);
 }

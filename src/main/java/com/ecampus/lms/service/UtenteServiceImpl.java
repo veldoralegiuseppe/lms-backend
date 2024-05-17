@@ -1,7 +1,9 @@
 package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.UtenteDAO;
+import com.ecampus.lms.dto.request.SearchUtenteRequest;
 import com.ecampus.lms.dto.request.UtenteRequest;
+import com.ecampus.lms.dto.response.UtenteDTO;
 import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import jakarta.persistence.EntityExistsException;
@@ -31,6 +33,19 @@ public class UtenteServiceImpl implements UtenteService{
 
     public List<UtenteEntity> findAll(){
         return dao.findAll();
+    }
+
+    @Override
+    public Page<UtenteDTO> searchBy(SearchUtenteRequest request, Pageable pageable) {
+        return dao.searchBy(
+                        request.utente().nome() != null ? request.utente().nome().toUpperCase() : null,
+                        request.utente().cognome() != null ? request.utente().cognome().toUpperCase() : null,
+                        request.utente().email() != null ? request.utente().email().toUpperCase() : null,
+                        request.utente().ruolo() != null ? UserRole.valueOf(request.utente().ruolo()) : null,
+                        request.utente().codiceFiscale() != null ? request.utente().codiceFiscale().toUpperCase() : null,
+                        request.nomeCorso() != null ? request.nomeCorso().toUpperCase() : null,
+                        pageable)
+                .map(e -> new UtenteDTO(e.getNome(), e.getCognome(), e.getCodiceFiscale(), e.getEmail(), e.getRuolo().name()));
     }
 
     @Override

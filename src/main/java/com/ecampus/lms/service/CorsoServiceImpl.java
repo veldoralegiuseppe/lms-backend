@@ -2,6 +2,7 @@ package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.CorsoDAO;
 import com.ecampus.lms.dao.CorsoSummaryDAO;
+import com.ecampus.lms.dto.response.CorsoDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.entity.CorsoSummaryEntity;
@@ -15,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +54,11 @@ public class CorsoServiceImpl implements CorsoService{
                 return null;
             }
         }
+    }
+
+    @Override
+    public List<CorsoDTO> getAllNomeCorsi() {
+        return dao.getAllNomeCorsi().stream().map(nome -> new CorsoDTO(nome,null,null,null,null,null)).collect(Collectors.toList());
     }
 
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){
