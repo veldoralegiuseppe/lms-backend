@@ -8,7 +8,6 @@ import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.entity.CorsoSummaryEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
-import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

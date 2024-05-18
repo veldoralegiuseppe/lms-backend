@@ -1,7 +1,6 @@
 package com.ecampus.lms.dao;
 
 import com.ecampus.lms.entity.CorsoSummaryEntity;
-import com.ecampus.lms.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

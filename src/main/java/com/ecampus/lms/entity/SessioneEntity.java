@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class SessioneEntity {
 
     @NotNull
     @Column(name = "\"DSECR_DATA\"", nullable = false)
-    private ZonedDateTime dataOra;
+    private Date data;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DSECR_FK_DCORS\"")
@@ -29,5 +30,9 @@ public class SessioneEntity {
     @NotNull
     @Column(name = "\"DSECR_TIPO\"", nullable = false, length = Integer.MAX_VALUE)
     private String tipo;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "\"DSECR_FK_DDOCU\"")
+    private DocumentaleEntity provaScritta;
 
 }
