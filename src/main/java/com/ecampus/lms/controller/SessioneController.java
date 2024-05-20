@@ -1,5 +1,6 @@
 package com.ecampus.lms.controller;
 
+import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.MessageDTO;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.security.PreAuthorizeAll;
@@ -12,8 +13,12 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/sessione")
@@ -33,11 +38,11 @@ public class SessioneController {
         return ResponseEntity.ok(service.getSessioni(PageRequest.of(page, size)));
     }
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Crea una nuova sessione")
     @PreAuthorizeDocente
-    public ResponseEntity<MessageDTO> create(@RequestBody SessioneDTO request) {
-        service.create(request);
+    public ResponseEntity<MessageDTO> create(@RequestPart("sessione") SessioneRequest request, @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+        service.create(request, file);
         return ResponseEntity.ok(new MessageDTO("Sessione creata con successo"));
     }
 }

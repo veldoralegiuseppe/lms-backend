@@ -25,11 +25,13 @@ public class ExceptionManager {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new Error(e.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Error> genericExceptionHandler(Exception e){
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error(e.getMessage()));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Error> genericExceptionHandler(Exception e){
+//        String errorMessage = e.getMessage();
+//        if(e.getMessage() == null) errorMessage = "Errore interno";
+//        log.error(errorMessage);
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error(errorMessage));
+//    }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Error> handleMaxSizeException(MaxUploadSizeExceededException e) {

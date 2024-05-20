@@ -41,4 +41,11 @@ public class CorsoController {
     public ResponseEntity<List<CorsoDTO>> getAllNomeCorsi(){
         return ResponseEntity.ok(service.getAllNomeCorsi());
     }
+
+    @GetMapping("/list/docente/nome")
+    @Operation(summary = "Restituisce i nomi di tutti i corsi afferenti al docente")
+    public ResponseEntity<List<CorsoDTO>> getNomeCorsiByDocente(){
+        return ResponseEntity.ok(service.getNomeCorsiByDocente());
+    }
+
 }

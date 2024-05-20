@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -21,7 +22,7 @@ public class SessioneEntity {
 
     @NotNull
     @Column(name = "\"DSECR_DATA\"", nullable = false)
-    private Date data;
+    private LocalDate data;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DSECR_FK_DCORS\"")

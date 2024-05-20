@@ -18,7 +18,7 @@ public class DocumentaleEntity {
     @Id
     @Column(name = "\"DDOCU_PK_ID\"", nullable = false, length = Integer.MAX_VALUE)
     @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
     @NotNull
@@ -30,8 +30,8 @@ public class DocumentaleEntity {
     private String tipo;
 
     @NotNull
-    @Column(name = "\"DDOCU_DATI\"", nullable = false)
-    @Lob
+    @Column(name = "\"DDOCU_DATI\"", nullable = false, columnDefinition="bytea")
+    //@Lob
     private byte[] dati;
 
     @NotNull
@@ -39,12 +39,12 @@ public class DocumentaleEntity {
     @JoinColumn(name = "\"DDOCU_FK_DUTNE\"", nullable = false)
     private UtenteEntity utente;
 
-    @NotNull
+    //@NotNull
     @Column(name = "\"DDOCU_INSERT_DATE\"", nullable = false)
     @CreationTimestamp
     private ZonedDateTime insertDate;
 
-    @NotNull
+    //@NotNull
     @Column(name = "\"DDOCU_UPDATE_DATE\"", nullable = false)
     @UpdateTimestamp
     private ZonedDateTime updateDate;

@@ -9,4 +9,5 @@ import java.util.List;
 public interface CorsoService {
     CorsoSummaryResponse getSummary(Pageable pageable);
     List<CorsoDTO> getAllNomeCorsi();
+    List<CorsoDTO> getNomeCorsiByDocente();
 }

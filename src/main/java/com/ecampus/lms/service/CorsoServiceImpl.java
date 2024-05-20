@@ -60,6 +60,16 @@ public class CorsoServiceImpl implements CorsoService{
         return dao.getAllNomeCorsi().stream().map(nome -> new CorsoDTO(nome,null,null,null,null,null)).collect(Collectors.toList());
     }
 
+    @Override
+    public List<CorsoDTO> getNomeCorsiByDocente() {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final UserRole role = details.role();
+        final String email = details.username();
+
+        return dao.getAllNomeCorsiByDocente(email).stream().map(nome -> new CorsoDTO(nome,null,null,null,null,null)).collect(Collectors.toList());
+    }
+
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){
 
         final String nomeCorso = entity.getNomeCorso();
