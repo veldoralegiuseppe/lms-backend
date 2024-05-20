@@ -1,6 +1,8 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
+import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +14,5 @@ public interface SessioneService {
     Page<SessioneDTO> getSessioni(Pageable pageable);
     void create(SessioneRequest sessione, MultipartFile file) throws IOException;
     SessioneDTO get(Integer id);
+    Page<SearchSessioneResponse> search(SearchSessioneRequest request, Pageable pageable);
 }

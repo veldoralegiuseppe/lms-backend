@@ -1,11 +1,11 @@
 package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.CorsoDAO;
-import com.ecampus.lms.dao.DocumentaleDAO;
 import com.ecampus.lms.dao.SessioneDAO;
-import com.ecampus.lms.dao.UtenteDAO;
+import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.DocumentaleDTO;
+import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.entity.DocumentaleEntity;
 import com.ecampus.lms.entity.SessioneEntity;
@@ -16,7 +16,6 @@ import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
@@ -75,6 +74,18 @@ public class SessioneServiceImpl implements SessioneService{
                 .orElseThrow(() -> new EntityNotFoundException("Sessione con id:'" + id +"' non presente in archivio"));
     }
 
+    @Override
+    public Page<SearchSessioneResponse> search(SearchSessioneRequest request, Pageable pageable) {
+        final String tipo = request.tipo() != null ? request.tipo().toUpperCase() : null;
+        final String corso =  request.nomeCorso()!= null ? request.nomeCorso().toUpperCase() : null;
+        final LocalDate dataDa = request.dataDa() != null ? request.dataDa() : null;
+        final LocalDate dataA = request.dataA() != null ? request.dataA() : null;
+
+        log.info("Ricerco le sessioni per dataDa: {}", dataDa);
+
+        return dao.search(corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);
+    }
+
     /*Utility methods*/
     private SessioneDTO mapToResponse(SessioneEntity entity){
         final String dateTimePattern = "dd/mm/yyyy";
@@ -99,6 +110,20 @@ public class SessioneServiceImpl implements SessioneService{
         final SessioneEntity sessione = tuple.get("SESSIONE", SessioneEntity.class);
 
         return new SessioneDTO(sessione.getId(), nomeCorso, sessione.getData(), sessione.getTipo(), null);
+
+    }
+    private SearchSessioneResponse mapToSearchResponse(Tuple tuple){
+        final String nomeCorso = tuple.get("NOME_CORSO", String.class);
+        final LocalDate data = tuple.get("DATA", LocalDate.class);
+        final String tipo = tuple.get("TIPO", String.class);
+        final String nomeDocente = tuple.get("NOME_DOCENTE", String.class);
+        final String cognomeDocente = tuple.get("COGNOME_DOCENTE", String.class);
+        final String emailDocente = tuple.get("EMAIL_DOCENTE", String.class);
+        final Integer numeroStudenti = tuple.get("NUMERO_STUDENTI", Integer.class);
+
+        return new SearchSessioneResponse(nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti);
+
+
 
     }
 

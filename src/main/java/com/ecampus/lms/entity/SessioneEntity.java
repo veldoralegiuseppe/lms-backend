@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -22,6 +20,7 @@ public class SessioneEntity {
 
     @NotNull
     @Column(name = "\"DSECR_DATA\"", nullable = false)
+    @Temporal(TemporalType.DATE)
     private LocalDate data;
 
     @ManyToOne(fetch = FetchType.LAZY)

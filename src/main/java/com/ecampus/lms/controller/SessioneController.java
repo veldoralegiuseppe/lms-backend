@@ -1,7 +1,9 @@
 package com.ecampus.lms.controller;
 
+import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.MessageDTO;
+import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
@@ -32,9 +34,9 @@ public class SessioneController {
     @GetMapping("/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo delle sessioni relative allo studente")
     public ResponseEntity<Page<SessioneDTO>> getSessioni(@Parameter(description = "Numero di pagina richiesto")
-                                                                 @PathVariable @Min(0) int page,
-                                                                 @Parameter(description = "Numero di elementi richiesti")
-                                                                 @PathVariable @Min(1) int size) {
+                                                         @PathVariable @Min(0) int page,
+                                                         @Parameter(description = "Numero di elementi richiesti")
+                                                         @PathVariable @Min(1) int size) {
         return ResponseEntity.ok(service.getSessioni(PageRequest.of(page, size)));
     }
 
@@ -44,5 +46,15 @@ public class SessioneController {
     public ResponseEntity<MessageDTO> create(@RequestPart("sessione") SessioneRequest request, @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         service.create(request, file);
         return ResponseEntity.ok(new MessageDTO("Sessione creata con successo"));
+    }
+
+    @PostMapping("/search/{size}/{page}")
+    @Operation(summary = "Ricerca sessioni")
+    public ResponseEntity<Page<SearchSessioneResponse>> search(@RequestBody SearchSessioneRequest request,
+                                                               @Parameter(description = "Numero di pagina richiesto")
+                                                               @PathVariable @Min(0) int page,
+                                                               @Parameter(description = "Numero di elementi richiesti")
+                                                               @PathVariable @Min(1) int size) {
+        return ResponseEntity.ok(service.search(request, PageRequest.of(page, size)));
     }
 }
