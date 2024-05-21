@@ -5,6 +5,7 @@ import com.ecampus.lms.dao.CorsoSummaryDAO;
 import com.ecampus.lms.dto.response.CorsoDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryResponse;
+import com.ecampus.lms.entity.CorsoEntity;
 import com.ecampus.lms.entity.CorsoSummaryEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
@@ -70,6 +71,16 @@ public class CorsoServiceImpl implements CorsoService{
         return dao.getAllNomeCorsiByDocente(email).stream().map(nome -> new CorsoDTO(nome,null,null,null,null,null)).collect(Collectors.toList());
     }
 
+    @Override
+    public List<CorsoDTO> getCorsiSenzaDocente() {
+        return dao.findByDocenteNull().stream().map(c -> new CorsoDTO(c.getNome(), null ,null, null, null, null)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CorsoDTO> getCorsiByStudente(String email) {
+        return dao.findByStudenti_EmailIgnoreCase(email).stream().map(c -> new CorsoDTO(c.getNome(), null, null, null, null, null)).collect(Collectors.toList());
+    }
+
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){
 
         final String nomeCorso = entity.getNomeCorso();
@@ -79,4 +90,5 @@ public class CorsoServiceImpl implements CorsoService{
 
         return new CorsoSummaryDTO(nomeCorso,moduli,sessioni,studenti);
     }
+
 }

@@ -11,10 +11,7 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,6 +43,18 @@ public class CorsoController {
     @Operation(summary = "Restituisce i nomi di tutti i corsi afferenti al docente")
     public ResponseEntity<List<CorsoDTO>> getNomeCorsiByDocente(){
         return ResponseEntity.ok(service.getNomeCorsiByDocente());
+    }
+
+    @GetMapping("/list/cattedra-libera")
+    @Operation(summary = "Restituisce i nomi di tutti i corsi cui non è stato assegnato un docente")
+    public ResponseEntity<List<CorsoDTO>> getCorsiSenzaDocente(){
+        return ResponseEntity.ok(service.getCorsiSenzaDocente());
+    }
+
+    @GetMapping("/list/studente")
+    @Operation(summary = "Restituisce i corsi afferenti allo studente")
+    public ResponseEntity<List<CorsoDTO>> getCorsiByStudente(@RequestBody String email){
+        return ResponseEntity.ok(service.getCorsiByStudente(email));
     }
 
 }

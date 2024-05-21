@@ -1,5 +1,6 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dao.CorsoDAO;
 import com.ecampus.lms.dao.UtenteDAO;
 import com.ecampus.lms.dto.request.SearchUtenteRequest;
 import com.ecampus.lms.dto.request.UtenteRequest;
@@ -7,6 +8,7 @@ import com.ecampus.lms.dto.response.UtenteDTO;
 import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,8 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +27,7 @@ import java.util.Optional;
 public class UtenteServiceImpl implements UtenteService{
 
     private final UtenteDAO dao;
+    private final CorsoDAO corsoDAO;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -54,6 +59,7 @@ public class UtenteServiceImpl implements UtenteService{
     }
 
     @Override
+    @Transactional
     public UtenteEntity create(UtenteRequest request) {
 
         final String codiceFiscale = request.codiceFiscale();
@@ -64,12 +70,12 @@ public class UtenteServiceImpl implements UtenteService{
             throw new EntityExistsException("email: " + username+ " è gia censita nel database");
         }
 
-        if(dao.existsByCodiceFiscale(codiceFiscale)){
+        if(dao.existsByCodiceFiscaleIgnoreCase(codiceFiscale)){
             log.error("create() - utente con codice fiscale: {} già presente in DUTNE_UTENTE", codiceFiscale);
             throw new EntityExistsException("il codice fiscale: " + codiceFiscale + " è gia censito nel database");
         }
 
-        log.info("create() - inserimento utente: {}", codiceFiscale);
+        log.info("create() - inserimento utente: {}", username);
 
         final UtenteEntity utenteEntity = new UtenteEntity();
         utenteEntity.setNome(request.nome());
@@ -77,9 +83,24 @@ public class UtenteServiceImpl implements UtenteService{
         utenteEntity.setCodiceFiscale(request.codiceFiscale());
         utenteEntity.setEmail(request.email());
         utenteEntity.setRuolo(request.ruolo());
-        utenteEntity.setPassword(passwordEncoder.encode(request.password()));
+        utenteEntity.setPassword(passwordEncoder.encode(request.password() != null ? request.password() : "password"));
 
-        return dao.save(utenteEntity);
+        final UtenteEntity utente = dao.save(utenteEntity);
+
+        if(request.corsi() != null && !request.ruolo().equals(UserRole.ADMIN)){
+            Arrays.stream(request.corsi())
+                    .map(nomeCorso -> corsoDAO.findByNomeIgnoreCase(nomeCorso))
+                    .forEach(optional -> optional.ifPresent(c -> {
+                        if(request.ruolo().equals(UserRole.STUDENTE)) {
+                            final Set<UtenteEntity> studenti = c.getStudenti();
+                            studenti.add(utente);
+                            c.setStudenti(studenti);
+                        }
+                        else c.setDocente(utente);
+                    }));
+        }
+
+        return utente;
     }
 
     @Override

@@ -25,4 +25,8 @@ public interface CorsoDAO extends JpaRepository<CorsoEntity, Integer> {
     """)
     List<String> getAllNomeCorsiByDocente(@NonNull @Param("email") String email);
 
+    List<CorsoEntity> findByDocenteNull();
+
+    List<CorsoEntity> findByStudenti_EmailIgnoreCase(String email);
+
 }

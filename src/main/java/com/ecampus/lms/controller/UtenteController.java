@@ -35,7 +35,7 @@ public class UtenteController {
 
     @PostMapping("/search/{size}/{page}")
     @Operation(summary = "Cerca un utente in base ai filtri selezionati")
-    public ResponseEntity<Page<UtenteDTO>> create(@RequestBody SearchUtenteRequest request,
+    public ResponseEntity<Page<UtenteDTO>> searchBy(@RequestBody SearchUtenteRequest request,
                                                   @Parameter(description = "Numero di pagina richiesto")
                                                   @PathVariable @Min(0) int page,
                                                   @Parameter(description = "Numero di elementi richiesti")

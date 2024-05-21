@@ -17,7 +17,7 @@ public interface UtenteDAO extends JpaRepository<UtenteEntity, Integer> {
     @Query("select u from UtenteEntity u where u.ruolo = ?1")
     Page<UtenteEntity> findByRole(@NonNull UserRole ruolo, Pageable pageable);
 
-    boolean existsByCodiceFiscale(@NonNull String codiceFiscale);
+    boolean existsByCodiceFiscaleIgnoreCase(@NonNull String codiceFiscale);
 
     boolean existsByEmailIgnoreCase(@NonNull String email);
 
@@ -25,16 +25,16 @@ public interface UtenteDAO extends JpaRepository<UtenteEntity, Integer> {
     Optional<UtenteEntity> findByEmail(@NonNull String email);
 
     @Query("""
-            select u
-            from CorsoEntity c , UtenteEntity u
-            right join c.studenti s right join c.docente d
+            select distinct u
+            from 
+            UtenteEntity u left join u.corsi cr left join CorsoEntity c on (c.docente.id = u.id or c.id = cr.id)
             where 
                     (:nome is null or upper(u.nome) = :nome) and
                     (:cognome is null or upper(u.cognome) = :cognome) and
                     (:email is null or upper(u.email) = :email) and
                     (:ruolo is null or u.ruolo = :ruolo) and
                     (:cf is null or upper(u.codiceFiscale) = :cf) and 
-                    ( (:nomeCorso is null or upper(c.nome) = :nomeCorso) and (u.id = s.id or  u.id = d.id) )
+                    (:nomeCorso is null or upper(c.nome) = :nomeCorso)
             """)
     Page<UtenteEntity> searchBy(@Nullable @Param("nome") String nome,
                                 @Nullable @Param("cognome") String cognome,

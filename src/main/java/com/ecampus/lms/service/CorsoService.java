@@ -10,4 +10,6 @@ public interface CorsoService {
     CorsoSummaryResponse getSummary(Pageable pageable);
     List<CorsoDTO> getAllNomeCorsi();
     List<CorsoDTO> getNomeCorsiByDocente();
+    List<CorsoDTO> getCorsiSenzaDocente();
+    List<CorsoDTO> getCorsiByStudente(String email);
 }
