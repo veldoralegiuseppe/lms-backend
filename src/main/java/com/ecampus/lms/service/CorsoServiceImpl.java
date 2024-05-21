@@ -1,14 +1,18 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dto.request.CreateCorsoRequest;
 import com.ecampus.lms.dao.CorsoDAO;
 import com.ecampus.lms.dao.CorsoSummaryDAO;
+import com.ecampus.lms.dao.UtenteDAO;
 import com.ecampus.lms.dto.response.CorsoDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryResponse;
 import com.ecampus.lms.entity.CorsoEntity;
 import com.ecampus.lms.entity.CorsoSummaryEntity;
+import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,7 @@ public class CorsoServiceImpl implements CorsoService{
 
     private final CorsoDAO dao;
     private final CorsoSummaryDAO summaryDAO;
+    private final UtenteDAO utenteDAO;
 
     @Override
     public CorsoSummaryResponse getSummary(Pageable pageable) {
@@ -79,6 +84,18 @@ public class CorsoServiceImpl implements CorsoService{
     @Override
     public List<CorsoDTO> getCorsiByStudente(String email) {
         return dao.findByStudenti_EmailIgnoreCase(email).stream().map(c -> new CorsoDTO(c.getNome(), null, null, null, null, null)).collect(Collectors.toList());
+    }
+
+    @Override
+    public CorsoEntity create(CreateCorsoRequest request) {
+        final UtenteEntity docente = utenteDAO.findByEmail(request.emailDocente()).orElseThrow(() -> new EntityNotFoundException("Docente '" + request.emailDocente() + "' non presente in tabella"));
+
+        final CorsoEntity entity = new CorsoEntity();
+        entity.setNome(request.nome());
+        entity.setDescrizione(request.descrizione());
+        entity.setDocente(docente);
+
+        return dao.save(entity);
     }
 
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){

@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/utente")
 @RequiredArgsConstructor
@@ -41,6 +43,12 @@ public class UtenteController {
                                                   @Parameter(description = "Numero di elementi richiesti")
                                                   @PathVariable @Min(1) int size) {
         return ResponseEntity.ok(utenteService.searchBy(request, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/list/docenti")
+    @Operation(summary = "Ritorna i docenti")
+    public ResponseEntity<List<UtenteDTO>> getDocenti(){
+        return ResponseEntity.ok(utenteService.getDocenti());
     }
 
 

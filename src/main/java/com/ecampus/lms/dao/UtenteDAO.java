@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UtenteDAO extends JpaRepository<UtenteEntity, Integer> {
@@ -43,4 +44,6 @@ public interface UtenteDAO extends JpaRepository<UtenteEntity, Integer> {
                                 @Nullable @Param("cf") String codiceFiscale,
                                 @Nullable @Param("nomeCorso") String nomeCorso,
                                 Pageable pageable);
+
+    List<UtenteEntity> findByRuolo(UserRole ruolo);
 }

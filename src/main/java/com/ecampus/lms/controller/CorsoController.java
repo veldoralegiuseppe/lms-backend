@@ -1,7 +1,9 @@
 package com.ecampus.lms.controller;
 
+import com.ecampus.lms.dto.request.CreateCorsoRequest;
 import com.ecampus.lms.dto.response.CorsoDTO;
 import com.ecampus.lms.dto.response.CorsoSummaryResponse;
+import com.ecampus.lms.security.PreAuthorizeAdmin;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.service.CorsoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,10 +53,18 @@ public class CorsoController {
         return ResponseEntity.ok(service.getCorsiSenzaDocente());
     }
 
-    @GetMapping("/list/studente")
+    @PostMapping("/list/studente")
     @Operation(summary = "Restituisce i corsi afferenti allo studente")
     public ResponseEntity<List<CorsoDTO>> getCorsiByStudente(@RequestBody String email){
         return ResponseEntity.ok(service.getCorsiByStudente(email));
+    }
+
+    @PostMapping
+    @Operation(summary = "Crea un corso")
+    @PreAuthorizeAdmin
+    public ResponseEntity<Void> create(@RequestBody CreateCorsoRequest request){
+        service.create(request);
+        return ResponseEntity.ok().build();
     }
 
 }

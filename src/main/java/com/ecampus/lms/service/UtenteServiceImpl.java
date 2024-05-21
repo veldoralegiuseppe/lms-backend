@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,15 +31,6 @@ public class UtenteServiceImpl implements UtenteService{
     private final CorsoDAO corsoDAO;
     private final PasswordEncoder passwordEncoder;
 
-
-    @Override
-    public Page<UtenteEntity> findAll(Pageable pageable) {
-        return dao.findAll(pageable);
-    }
-
-    public List<UtenteEntity> findAll(){
-        return dao.findAll();
-    }
 
     @Override
     public Page<UtenteDTO> searchBy(SearchUtenteRequest request, Pageable pageable) {
@@ -54,8 +46,10 @@ public class UtenteServiceImpl implements UtenteService{
     }
 
     @Override
-    public Page<UtenteEntity> findByRole(UserRole role, Pageable pageable) {
-        return dao.findByRole(UserRole.STUDENTE, pageable);
+    public List<UtenteDTO> getDocenti() {
+        return dao.findByRuolo(UserRole.DOCENTE).stream()
+                .map(e -> new UtenteDTO(e.getNome(), e.getCognome(), e.getCodiceFiscale(), e.getEmail(), e.getRuolo().name()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -101,11 +95,6 @@ public class UtenteServiceImpl implements UtenteService{
         }
 
         return utente;
-    }
-
-    @Override
-    public Optional<UtenteEntity> findById(Integer id) {
-        return dao.findById(id);
     }
 
     @Override
