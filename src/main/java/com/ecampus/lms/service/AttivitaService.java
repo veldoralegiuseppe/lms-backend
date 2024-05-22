@@ -1,8 +1,11 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dto.request.CreateAttivitaRequest;
+import com.ecampus.lms.dto.response.AttivitaDTO;
 import com.ecampus.lms.dto.response.AttivitaSummaryResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface AttivitaService {
     AttivitaSummaryResponse getAttivitaStudente(Pageable pageable);
+    AttivitaDTO create(CreateAttivitaRequest request);
 }

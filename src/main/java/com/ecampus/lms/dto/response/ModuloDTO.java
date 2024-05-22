@@ -1,11 +1,14 @@
 package com.ecampus.lms.dto.response;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record ModuloDTO(@NotBlank String nome,
+public record ModuloDTO(@NotNull Integer id,
+                        @NotBlank String nome,
                         @NotBlank String descrizione,
-                        CorsoDTO corso,
-                        List<AttivitaDTO> attivita) {
+                        @NotNull Integer idCorso,
+                        @NotBlank String nomeCorso,
+                        List<Integer> idsAttivita) {
 }

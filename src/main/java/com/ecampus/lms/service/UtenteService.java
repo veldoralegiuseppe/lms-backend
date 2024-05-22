@@ -4,7 +4,6 @@ import com.ecampus.lms.dto.request.SearchUtenteRequest;
 import com.ecampus.lms.dto.request.UtenteRequest;
 import com.ecampus.lms.dto.response.UtenteDTO;
 import com.ecampus.lms.entity.UtenteEntity;
-import com.ecampus.lms.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

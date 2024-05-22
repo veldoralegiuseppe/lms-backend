@@ -1,11 +1,18 @@
 package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.AttivitaDAO;
+import com.ecampus.lms.dao.ModuloDAO;
+import com.ecampus.lms.dto.request.CreateAttivitaRequest;
+import com.ecampus.lms.dto.response.AttivitaDTO;
 import com.ecampus.lms.dto.response.AttivitaSummaryDTO;
 import com.ecampus.lms.dto.response.AttivitaSummaryResponse;
 import com.ecampus.lms.entity.AttivitaEntity;
+import com.ecampus.lms.entity.DocumentaleEntity;
+import com.ecampus.lms.entity.ModuloEntity;
+import com.ecampus.lms.enums.TipoAttivita;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class AttivitaServiceImpl implements AttivitaService {
 
     private final AttivitaDAO dao;
+    private final ModuloDAO moduloDAO;
 
     @Override
     public AttivitaSummaryResponse getAttivitaStudente(Pageable pageable) {
@@ -34,11 +42,30 @@ public class AttivitaServiceImpl implements AttivitaService {
         return new AttivitaSummaryResponse(summaries);
     }
 
+    @Override
+    public AttivitaDTO create(CreateAttivitaRequest request) {
+        final ModuloEntity modulo = moduloDAO.findById(request.idModulo()).orElseThrow(() -> new EntityNotFoundException("Modulo con id:" + request.idModulo() + " non presente in archivio"));
+
+        final AttivitaEntity attivita = new AttivitaEntity();
+        attivita.setModulo(modulo);
+        attivita.setTipo(request.tipo());
+        attivita.setSettimanaProgrammata(request.settimanaProgrammata());
+
+        return mapEntityToDAO(dao.save(attivita));
+    }
+
     private AttivitaSummaryDTO mappingToResponse(Tuple tuple) {
         final AttivitaEntity attivita = tuple.get("ATTIVITA", AttivitaEntity.class);
         final String nomeCorso = tuple.get("NOME_CORSO", String.class);
 
-        return new AttivitaSummaryDTO(nomeCorso, attivita.getTipo(), attivita.getSettimanaProgrammata());
+        return new AttivitaSummaryDTO(nomeCorso, attivita.getTipo().name(), attivita.getSettimanaProgrammata());
+    }
+
+    private AttivitaDTO mapEntityToDAO(AttivitaEntity attivita){
+        final ModuloEntity modulo = attivita.getModulo();
+        final DocumentaleEntity file = attivita.getFile();
+
+        return new AttivitaDTO(attivita.getTipo().name(), attivita.getSettimanaProgrammata(), modulo.getId(), attivita.getId(), file.getId());
     }
 
 }

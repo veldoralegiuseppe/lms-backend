@@ -1,5 +1,6 @@
 package com.ecampus.lms.entity;
 
+import com.ecampus.lms.enums.TipoAttivita;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,19 +17,22 @@ public class AttivitaEntity {
     @Column(name = "\"DATTV_PK_ID\"", nullable = false)
     private Integer id;
 
-    @Column(name = "\"DATTV_DESCRIZIONE\"", length = Integer.MAX_VALUE)
-    private String descrizione;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DATTV_FK_DMODL\"")
     private ModuloEntity modulo;
 
     @NotNull
     @Column(name = "\"DATTV_TIPO\"", nullable = false, length = Integer.MAX_VALUE)
-    private String tipo;
+    @Enumerated(EnumType.STRING)
+    private TipoAttivita tipo;
 
     @NotNull
-    @Column(name = "\"DATTV_SETTIMANA_PROGRAMMATA\"", nullable = false, length = Integer.MAX_VALUE)
-    private String settimanaProgrammata;
+    @Column(name = "\"DATTV_SETTIMANA_PROGRAMMATA\"", nullable = false)
+    private Integer settimanaProgrammata;
+
+    @NotNull
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "\"DATTV_FK_DDOCU\"", nullable = false)
+    private DocumentaleEntity file;
 
 }
