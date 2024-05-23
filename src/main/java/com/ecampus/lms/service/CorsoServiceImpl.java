@@ -1,5 +1,6 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.beans.DettaglioCorsoBean;
 import com.ecampus.lms.dao.CorsoDAO;
 import com.ecampus.lms.dao.CorsoSummaryDAO;
 import com.ecampus.lms.dao.UtenteDAO;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,22 +102,39 @@ public class CorsoServiceImpl implements CorsoService{
     @Override
     public CorsoDetailsDTO getDettaglio(TipoDettaglioCorso dettaglio, Integer id) {
        switch (dettaglio){
-           case M_A -> { return getDettaglio_ModuliAttivita(id); }
+           case M_A_F -> { return getDettaglio_ModuliAttivitaFile(id); }
            default -> { return null; }
        }
     }
 
-    private CorsoDetailsDTO getDettaglio_ModuliAttivita(Integer id){
-        final CorsoEntity corso = dao.findById(id).orElseThrow(() -> new EntityNotFoundException("Corso con id:" + id + " non presente in archivio"));
+    private CorsoDetailsDTO getDettaglio_ModuliAttivitaFile(Integer id){
+        final List<DettaglioCorsoBean> dettaglio = dao.findDettaglio(id);
 
-        final List<ModuloDetailsDTO> moduli = corso.getModuli().stream()
-                .map(m -> {
-                    final List<AttivitaDTO> attivita = m.getAttivita().stream().map(a -> new AttivitaDTO(a.getTipo().name(), a.getSettimanaProgrammata(), m.getId(), a.getId(), a.getFile().getId())).collect(Collectors.toList());
-                    return new ModuloDetailsDTO(m.getId(), m.getNome(), m.getDescrizione(), corso.getId(), corso.getNome(), attivita);
-                })
-                .collect(Collectors.toList());
+        if(dettaglio == null || dettaglio.isEmpty())
+            throw new EntityNotFoundException("Corso con id:" + id + " non presente in archivio");
 
-        return new CorsoDetailsDTO(corso.getId(), corso.getNome(), corso.getDescrizione(), moduli, null, null, null);
+        final List<ModuloDetailsDTO> moduli = new ArrayList<>();
+
+        dettaglio.stream()
+                .forEach( d -> {
+
+                    if(d.getIdModulo() != null &&  (moduli.isEmpty() || !moduli.get(moduli.size()-1).id().equals(d.getIdModulo()))){
+                        moduli.add(new ModuloDetailsDTO(d.getIdModulo(),d.getNomeModulo(),d.getDescrizioneModulo(),d.getIdCorso(), d.getNomeCorso(),new ArrayList<>()));
+                    }
+
+                    DocumentaleDTO file = null;
+                    if(d.getIdFile() != null) file = new DocumentaleDTO(d.getIdFile(),d.getNomeFile(),d.getContentType(),null,d.getFileInsertDate(),d.getFileUpdateDate());
+
+                    AttivitaDetailsDTO attivita = null;
+                    if(d.getIdAttivita() != null) {
+                        attivita = new AttivitaDetailsDTO(d.getIdAttivita(), d.getTipoAttivita().name(), d.getSettimanaProgrammata(), d.getIdModulo(), file);
+                        moduli.get(moduli.size()-1).attivita().add(attivita);
+                    }
+
+                });
+
+        // Compongo il corso
+        return new CorsoDetailsDTO(dettaglio.get(0).getIdCorso(), dettaglio.get(0).getNomeCorso(), dettaglio.get(0).getDescrizioneCorso(), moduli, null, null, null);
     }
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){
 

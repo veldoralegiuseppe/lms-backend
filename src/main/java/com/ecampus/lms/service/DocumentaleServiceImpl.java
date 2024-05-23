@@ -2,6 +2,7 @@ package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.DocumentaleDAO;
 import com.ecampus.lms.dao.UtenteDAO;
+import com.ecampus.lms.dto.response.DocumentaleDTO;
 import com.ecampus.lms.entity.DocumentaleEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
@@ -43,5 +44,11 @@ public class DocumentaleServiceImpl implements DocumentaleService{
         entity.setUtente( utenteDAO.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Utente '"+ email + "' non presente in archivio")) );
 
         return dao.save(entity);
+    }
+
+    @Override
+    public DocumentaleDTO download(String uuid) {
+        final DocumentaleEntity file = dao.findById(uuid).orElseThrow(() -> new EntityNotFoundException("File '" + uuid + "' non presente in archivio"));
+        return new DocumentaleDTO(file.getId(),file.getNome(), file.getTipo(), file.getDati(), file.getInsertDate(), file.getUpdateDate());
     }
 }

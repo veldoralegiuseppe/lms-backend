@@ -2,7 +2,7 @@ package com.ecampus.lms.enums;
 
 public enum TipoDettaglioCorso {
     /**
-     * Modulo e attivita
+     * Modulo, attivita, file
      */
-    M_A,
+    M_A_F,
 }

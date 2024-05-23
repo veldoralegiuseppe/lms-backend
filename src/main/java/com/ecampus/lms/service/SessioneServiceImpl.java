@@ -96,7 +96,7 @@ public class SessioneServiceImpl implements SessioneService{
         final DocumentaleEntity documentale = sessione.getProvaScritta();
 
         DocumentaleDTO documentaleDTO = documentale != null ? new DocumentaleDTO(documentale.getId(), documentale.getNome(), documentale.getTipo(), documentale.getDati(),
-                                        documentale.getInsertDate().toLocalDate().format(dateTimeFormatter), documentale.getUpdateDate().toLocalDate().format(dateTimeFormatter)) : null;
+                                        documentale.getInsertDate(), documentale.getUpdateDate()) : null;
 
         SessioneDTO sessioneDTO = new SessioneDTO(sessione.getId(), sessione.getCorso().getNome(), sessione.getData(), sessione.getTipo(), documentaleDTO);
 

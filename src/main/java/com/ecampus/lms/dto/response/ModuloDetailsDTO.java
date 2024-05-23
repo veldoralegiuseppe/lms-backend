@@ -10,5 +10,5 @@ public record ModuloDetailsDTO(@NotNull Integer id,
                                @NotBlank String descrizione,
                                @NotNull Integer idCorso,
                                @NotBlank String nomeCorso,
-                               List<AttivitaDTO> attivita) {
+                               List<AttivitaDetailsDTO> attivita) {
 }

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface AttivitaDAO extends JpaRepository<AttivitaEntity, Integer> {
 
     @Query("""
@@ -19,4 +21,8 @@ public interface AttivitaDAO extends JpaRepository<AttivitaEntity, Integer> {
      WHERE s.ruolo = 'STUDENTE' AND s.email = :email
     """)
     Page<Tuple> findStudenteSummary(@Param("email") String email, Pageable pageable);
+
+    List<AttivitaEntity> findByModulo_Id(Integer id);
+
+
 }

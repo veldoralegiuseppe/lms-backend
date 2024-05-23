@@ -9,7 +9,6 @@ import com.ecampus.lms.dto.response.AttivitaSummaryResponse;
 import com.ecampus.lms.entity.AttivitaEntity;
 import com.ecampus.lms.entity.DocumentaleEntity;
 import com.ecampus.lms.entity.ModuloEntity;
-import com.ecampus.lms.enums.TipoAttivita;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
 import jakarta.persistence.EntityNotFoundException;
