@@ -13,13 +13,18 @@ import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class AttivitaServiceImpl implements AttivitaService {
 
     private final AttivitaDAO dao;
     private final ModuloDAO moduloDAO;
+    private final DocumentaleService documentaleService;
 
     @Override
     public AttivitaSummaryResponse getAttivitaStudente(Pageable pageable) {
@@ -42,13 +48,22 @@ public class AttivitaServiceImpl implements AttivitaService {
     }
 
     @Override
-    public AttivitaDTO create(CreateAttivitaRequest request) {
+    @Transactional
+    public AttivitaDTO create(CreateAttivitaRequest request, MultipartFile documento) throws FileUploadException {
         final ModuloEntity modulo = moduloDAO.findById(request.idModulo()).orElseThrow(() -> new EntityNotFoundException("Modulo con id:" + request.idModulo() + " non presente in archivio"));
+
+        DocumentaleEntity file;
+        try {
+            file = documentaleService.store(documento);
+        } catch (IOException e) {
+            throw new FileUploadException(e.getMessage());
+        }
 
         final AttivitaEntity attivita = new AttivitaEntity();
         attivita.setModulo(modulo);
         attivita.setTipo(request.tipo());
         attivita.setSettimanaProgrammata(request.settimanaProgrammata());
+        attivita.setFile(file);
 
         return mapEntityToDAO(dao.save(attivita));
     }

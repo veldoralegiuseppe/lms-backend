@@ -2,6 +2,7 @@ package com.ecampus.lms.controller;
 
 import jakarta.persistence.EntityExistsException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,16 +26,21 @@ public class ExceptionManager {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new Error(e.getMessage()));
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Error> genericExceptionHandler(Exception e){
-//        String errorMessage = e.getMessage();
-//        if(e.getMessage() == null) errorMessage = "Errore interno";
-//        log.error(errorMessage);
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error(errorMessage));
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Error> genericExceptionHandler(Exception e){
+        String errorMessage = e.getMessage();
+        if(e.getMessage() == null) errorMessage = "Errore interno";
+        log.error(errorMessage);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error(errorMessage));
+    }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Error> handleMaxSizeException(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new Error(e.getMessage()));
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<Error> handleFileUploadException(FileUploadException e) {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new Error(e.getMessage()));
     }
 

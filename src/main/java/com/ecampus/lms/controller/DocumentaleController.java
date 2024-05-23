@@ -37,6 +37,12 @@ public class DocumentaleController {
     @PostMapping(value = "/download", consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> downloadFile(@RequestParam("uuid") String uuid){
         final DocumentaleDTO download = service.download(uuid);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(download.data());
+
+        MediaType mediaType = null;
+        switch (download.contentType()){
+            default -> mediaType = MediaType.APPLICATION_PDF;
+        }
+
+        return ResponseEntity.ok().contentType(mediaType).body(download.data());
     }
 }

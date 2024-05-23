@@ -16,9 +16,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -90,11 +93,11 @@ public class CorsoController {
         return ResponseEntity.ok(moduloService.create(request));
     }
 
-    @PostMapping("/attivita")
+    @PostMapping(value = "/attivita",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Crea un attività")
     @PreAuthorizeDocente
-    public ResponseEntity<AttivitaDTO> createAttivita(@RequestBody CreateAttivitaRequest request) {
-        return ResponseEntity.ok(attivitaService.create(request));
+    public ResponseEntity<AttivitaDTO> createAttivita(@RequestPart("attivita") CreateAttivitaRequest request, @RequestPart("file") MultipartFile file) throws FileUploadException {
+        return ResponseEntity.ok(attivitaService.create(request, file));
     }
 
 }
