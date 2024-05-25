@@ -1,4 +1,4 @@
-package com.ecampus.lms.entity;
+package com.ecampus.lms.entity.key;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

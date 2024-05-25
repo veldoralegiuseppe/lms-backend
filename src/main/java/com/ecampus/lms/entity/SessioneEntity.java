@@ -37,10 +37,8 @@ public class SessioneEntity {
     @JoinColumn(name = "\"DSECR_FK_DDOCU\"")
     private DocumentaleEntity provaScritta;
 
-    @ManyToMany
-    @JoinTable(name = "\"RSEST_SESSIONE_STUDENTE\"",
-            joinColumns = @JoinColumn(name = "\"RSEST_FK_DSECR\""),
-            inverseJoinColumns = @JoinColumn(name = "\"RSEST_FK_DUTNE\""))
-    private Set<UtenteEntity> studenti = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "sessione")
+    private Set<IstanzaSessioneEntity> istanze = new LinkedHashSet<>();
 
 }

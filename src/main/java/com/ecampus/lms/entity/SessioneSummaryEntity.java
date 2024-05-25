@@ -1,5 +1,6 @@
 package com.ecampus.lms.entity;
 
+import com.ecampus.lms.entity.key.SessioneSummaryEntityId;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

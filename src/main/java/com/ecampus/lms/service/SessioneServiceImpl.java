@@ -1,18 +1,13 @@
 package com.ecampus.lms.service;
 
-import com.ecampus.lms.dao.CorsoDAO;
-import com.ecampus.lms.dao.SessioneDAO;
-import com.ecampus.lms.dao.SessioneSummaryDAO;
-import com.ecampus.lms.dao.UtenteDAO;
+import com.ecampus.lms.dao.*;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.DocumentaleDTO;
 import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
-import com.ecampus.lms.entity.DocumentaleEntity;
-import com.ecampus.lms.entity.SessioneEntity;
-import com.ecampus.lms.entity.SessioneSummaryEntity;
-import com.ecampus.lms.entity.UtenteEntity;
+import com.ecampus.lms.entity.*;
+import com.ecampus.lms.entity.key.IstanzaSessioneEntityId;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,7 +15,6 @@ import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
@@ -44,6 +37,7 @@ public class SessioneServiceImpl implements SessioneService{
     private final DocumentaleService documentaleService;
     private final UtenteDAO utenteDAO;
     private final SessioneSummaryDAO sessioneSummaryDAO;
+    private final IstanzaSessioneDAO istanzaSessioneDAO;
 
     @Override
     public Page<SearchSessioneResponse> getSummary(Pageable pageable) {
@@ -51,10 +45,6 @@ public class SessioneServiceImpl implements SessioneService{
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
         final String email = details.username().toUpperCase();
         final UserRole role = details.role();
-
-        final String dateTimePattern = "yyyy-mm-dd";
-        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
-        final String today =  dateTimeFormatter.format(LocalDateTime.now());
 
         return sessioneSummaryDAO.getSummary(email, role.name(), null, null, LocalDate.now(), null, pageable).map(this::mapToSearchResponse);
     }
@@ -102,6 +92,7 @@ public class SessioneServiceImpl implements SessioneService{
     }
 
     @Override
+    @Transactional
     public SessioneDTO iscrivi(Integer id) {
         final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
@@ -110,11 +101,17 @@ public class SessioneServiceImpl implements SessioneService{
         final UtenteEntity studente = utenteDAO.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Utente con id:" + id + " non presente in archivio"));
         final SessioneEntity sessione = dao.findById(id).orElseThrow(() -> new EntityNotFoundException("Sessione con id:" + id + " non presente in archivio"));
 
-        final Set<UtenteEntity> studenti = sessione.getStudenti();
-        studenti.add(studente);
-        sessione.setStudenti(studenti);
+        final IstanzaSessioneEntity istanza = new IstanzaSessioneEntity();
+        final IstanzaSessioneEntityId idIstanza = new IstanzaSessioneEntityId();
+        idIstanza.setIdSessione(sessione.getId());
+        idIstanza.setIdStudente(studente.getId());
+        istanza.setSessione(sessione);
+        istanza.setStudente(studente);
+        istanza.setId(idIstanza);
 
-        return mapToResponse(dao.save(sessione));
+        istanzaSessioneDAO.save(istanza);
+
+        return mapToResponse(sessione);
     }
 
     /*Utility methods*/

@@ -1,7 +1,7 @@
 package com.ecampus.lms.dao;
 
 import com.ecampus.lms.entity.SessioneSummaryEntity;
-import com.ecampus.lms.entity.SessioneSummaryEntityId;
+import com.ecampus.lms.entity.key.SessioneSummaryEntityId;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
