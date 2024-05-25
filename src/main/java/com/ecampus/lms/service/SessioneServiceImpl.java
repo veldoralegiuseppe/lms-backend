@@ -3,9 +3,7 @@ package com.ecampus.lms.service;
 import com.ecampus.lms.dao.*;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
-import com.ecampus.lms.dto.response.DocumentaleDTO;
-import com.ecampus.lms.dto.response.SearchSessioneResponse;
-import com.ecampus.lms.dto.response.SessioneDTO;
+import com.ecampus.lms.dto.response.*;
 import com.ecampus.lms.entity.*;
 import com.ecampus.lms.entity.key.IstanzaSessioneEntityId;
 import com.ecampus.lms.enums.UserRole;
@@ -25,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -114,6 +114,21 @@ public class SessioneServiceImpl implements SessioneService{
         return mapToResponse(sessione);
     }
 
+    @Override
+    public SessioneDetailsResponse detail(Integer id) {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username().toUpperCase();
+        final UserRole role = details.role();
+
+        switch (role){
+            case DOCENTE -> {return mapToDetailsResponse(dao.getSessionDetails(id), id);}
+            case STUDENTE -> {return null;}
+            case ADMIN -> {return null;}
+            default -> {return null;}
+        }
+    }
+
     /*Utility methods*/
     private SessioneDTO mapToResponse(SessioneEntity entity){
         final String dateTimePattern = "dd/mm/yyyy";
@@ -156,6 +171,34 @@ public class SessioneServiceImpl implements SessioneService{
 
         return new SearchSessioneResponse(idSessione, idCorso, nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti);
 
+    }
+    private SessioneDetailsResponse mapToDetailsResponse(List<Tuple> tuple, Integer idSessione){
+
+        final Tuple tupla = tuple.get(0);
+        final String nomeCorso = tupla.get("NOME_CORSO", String.class);
+        final String tipoSessione = tupla.get("TIPO_SESSIONE", String.class);
+        final String idProvaSomministrata = tupla.get("ID_PROVA_SOMMINISTRATA", String.class);
+        final String nomeDocente = tupla.get("NOME_DOCENTE", String.class);
+        final String cognomeDocente = tupla.get("COGNOME_DOCENTE", String.class);
+        final String emailDocente = tupla.get("EMAIL_DOCENTE", String.class);
+        final Integer idDocente = tupla.get("ID_DOCENTE", Integer.class);
+        final Integer idCorso = tupla.get("ID_CORSO", Integer.class);
+        final Integer numeroIscritti = tupla.get("NUMERO_ISCRITTI", Integer.class);
+        final LocalDate dataSessione = tupla.get("DATA_SESSIONE", LocalDate.class);
+
+        final List<IstanzaSessioneDTO> esami = tuple.stream().map(t -> {
+            final String nomeStudente = t.get("NOME_STUDENTE", String.class);
+            final String cognomeStudente = t.get("COGNOME_STUDENTE", String.class);
+            final String emailStudente = t.get("EMAIL_STUDENTE", String.class);
+            final Integer idStudente = t.get("ID_STUDENTE", Integer.class);
+            final String idFileStudente = t.get("ID_PROVA_STUDENTE", String.class);
+            final String codiceFiscaleStudente = t.get("CODICE_FISCALE_STUDENTE", String.class);
+            final String nomeFileStudente = t.get("NOME_PROVA_STUDENTE", String.class);
+
+           return new IstanzaSessioneDTO(idSessione, idStudente,nomeStudente,cognomeStudente,codiceFiscaleStudente,emailStudente,idFileStudente,nomeFileStudente);
+        }).collect(Collectors.toList());
+
+        return new SessioneDetailsResponse(idCorso,idDocente,nomeDocente,cognomeDocente,emailDocente,nomeCorso,idSessione,tipoSessione,dataSessione,numeroIscritti,idProvaSomministrata,esami);
     }
 
 }

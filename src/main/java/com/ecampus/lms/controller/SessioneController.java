@@ -4,6 +4,7 @@ import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.MessageDTO;
 import com.ecampus.lms.dto.response.SearchSessioneResponse;
+import com.ecampus.lms.dto.response.SessioneDetailsResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
@@ -65,4 +66,11 @@ public class SessioneController {
     public ResponseEntity<SessioneDTO> iscrivi(@Parameter(description = "Id della sessione") @PathVariable @Min(1) Integer id) {
         return ResponseEntity.ok(service.iscrivi(id));
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Dettaglio dellla sessione")
+    public ResponseEntity<SessioneDetailsResponse> detail(@Parameter(description = "Id della sessione") @PathVariable @Min(1) Integer id) {
+        return ResponseEntity.ok(service.detail(id));
+    }
+
 }
