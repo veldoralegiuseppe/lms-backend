@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,5 +36,11 @@ public class SessioneEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"DSECR_FK_DDOCU\"")
     private DocumentaleEntity provaScritta;
+
+    @ManyToMany
+    @JoinTable(name = "\"RSEST_SESSIONE_STUDENTE\"",
+            joinColumns = @JoinColumn(name = "\"RSEST_FK_DSECR\""),
+            inverseJoinColumns = @JoinColumn(name = "\"RSEST_FK_DUTNE\""))
+    private Set<UtenteEntity> studenti = new LinkedHashSet<>();
 
 }

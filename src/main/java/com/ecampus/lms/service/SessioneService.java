@@ -11,8 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface SessioneService {
-    Page<SessioneDTO> getSessioni(Pageable pageable);
+    Page<SearchSessioneResponse> getSummary(Pageable pageable);
     void create(SessioneRequest sessione, MultipartFile file) throws IOException;
     SessioneDTO get(Integer id);
     Page<SearchSessioneResponse> search(SearchSessioneRequest request, Pageable pageable);
+    SessioneDTO iscrivi(Integer id);
 }

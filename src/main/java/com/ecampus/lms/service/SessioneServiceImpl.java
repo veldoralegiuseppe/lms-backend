@@ -2,6 +2,8 @@ package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.CorsoDAO;
 import com.ecampus.lms.dao.SessioneDAO;
+import com.ecampus.lms.dao.SessioneSummaryDAO;
+import com.ecampus.lms.dao.UtenteDAO;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.response.DocumentaleDTO;
@@ -9,6 +11,8 @@ import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.entity.DocumentaleEntity;
 import com.ecampus.lms.entity.SessioneEntity;
+import com.ecampus.lms.entity.SessioneSummaryEntity;
+import com.ecampus.lms.entity.UtenteEntity;
 import com.ecampus.lms.enums.UserRole;
 import com.ecampus.lms.security.SecurityContextDetails;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +20,7 @@ import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -35,20 +42,21 @@ public class SessioneServiceImpl implements SessioneService{
     private final SessioneDAO dao;
     private final CorsoDAO corsoDAO;
     private final DocumentaleService documentaleService;
+    private final UtenteDAO utenteDAO;
+    private final SessioneSummaryDAO sessioneSummaryDAO;
 
     @Override
-    public Page<SessioneDTO> getSessioni(Pageable pageable) {
+    public Page<SearchSessioneResponse> getSummary(Pageable pageable) {
         final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
-        final String email = details.username();
+        final String email = details.username().toUpperCase();
         final UserRole role = details.role();
 
-        switch(role){
-            case STUDENTE -> { return dao.getSessioniStudente(email, pageable).map(this::mapToResponse); }
-            case DOCENTE -> { return dao.getSessioniDocente(email, pageable).map(this::mapToResponse); }
-            case ADMIN -> { return dao.getSessioni(pageable).map(this::mapToResponse); }
-            default -> { return null;}
-        }
+        final String dateTimePattern = "yyyy-mm-dd";
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        final String today =  dateTimeFormatter.format(LocalDateTime.now());
+
+        return sessioneSummaryDAO.getSummary(email, role.name(), null, null, LocalDate.now(), null, pageable).map(this::mapToSearchResponse);
     }
 
     @Override
@@ -76,14 +84,37 @@ public class SessioneServiceImpl implements SessioneService{
 
     @Override
     public Page<SearchSessioneResponse> search(SearchSessioneRequest request, Pageable pageable) {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username().toUpperCase();
+        final UserRole role = details.role();
+
         final String tipo = request.tipo() != null ? request.tipo().toUpperCase() : null;
         final String corso =  request.nomeCorso()!= null ? request.nomeCorso().toUpperCase() : null;
         final LocalDate dataDa = request.dataDa() != null ? request.dataDa() : null;
         final LocalDate dataA = request.dataA() != null ? request.dataA() : null;
 
-        log.info("Ricerco le sessioni per dataDa: {}", dataDa);
+        switch(role){
+            case STUDENTE -> {return sessioneSummaryDAO.searchStudente(email, corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);}
+            default -> {return sessioneSummaryDAO.getSummary(email, role.name(), corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);}
+        }
 
-        return dao.search(corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);
+    }
+
+    @Override
+    public SessioneDTO iscrivi(Integer id) {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username();
+
+        final UtenteEntity studente = utenteDAO.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Utente con id:" + id + " non presente in archivio"));
+        final SessioneEntity sessione = dao.findById(id).orElseThrow(() -> new EntityNotFoundException("Sessione con id:" + id + " non presente in archivio"));
+
+        final Set<UtenteEntity> studenti = sessione.getStudenti();
+        studenti.add(studente);
+        sessione.setStudenti(studenti);
+
+        return mapToResponse(dao.save(sessione));
     }
 
     /*Utility methods*/
@@ -113,17 +144,20 @@ public class SessioneServiceImpl implements SessioneService{
 
     }
     private SearchSessioneResponse mapToSearchResponse(Tuple tuple){
-        final String nomeCorso = tuple.get("NOME_CORSO", String.class);
-        final LocalDate data = tuple.get("DATA", LocalDate.class);
-        final String tipo = tuple.get("TIPO", String.class);
+
+        final SessioneSummaryEntity entity = tuple.get("SUMMARY", SessioneSummaryEntity.class);
+        final String emailDocente = tuple.get("EMAIL_DOCENTE", String.class);
         final String nomeDocente = tuple.get("NOME_DOCENTE", String.class);
         final String cognomeDocente = tuple.get("COGNOME_DOCENTE", String.class);
-        final String emailDocente = tuple.get("EMAIL_DOCENTE", String.class);
-        final Integer numeroStudenti = tuple.get("NUMERO_STUDENTI", Integer.class);
 
-        return new SearchSessioneResponse(nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti);
+        final Integer idSessione = entity.getId().getIdSessione();
+        final Integer idCorso = entity.getId().getIdCorso();
+        final String nomeCorso = entity.getNomeCorso();
+        final LocalDate data = entity.getDataSessione();
+        final String tipo = entity.getTipoSessione();
+        final Integer numeroStudenti = entity.getNumeroIscritti();
 
-
+        return new SearchSessioneResponse(idSessione, idCorso, nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti);
 
     }
 

@@ -7,6 +7,7 @@ import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
+import com.ecampus.lms.security.PreAuthorizeStudente;
 import com.ecampus.lms.service.SessioneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,12 +33,12 @@ public class SessioneController {
     private final SessioneService service;
 
     @GetMapping("/{size}/{page}")
-    @Operation(summary = "Restituisce il riepilogo delle sessioni relative allo studente")
-    public ResponseEntity<Page<SessioneDTO>> getSessioni(@Parameter(description = "Numero di pagina richiesto")
+    @Operation(summary = "Restituisce il riepilogo delle sessioni relative all'utente")
+    public ResponseEntity<Page<SearchSessioneResponse>> getSummary(@Parameter(description = "Numero di pagina richiesto")
                                                          @PathVariable @Min(0) int page,
                                                          @Parameter(description = "Numero di elementi richiesti")
                                                          @PathVariable @Min(1) int size) {
-        return ResponseEntity.ok(service.getSessioni(PageRequest.of(page, size)));
+        return ResponseEntity.ok(service.getSummary(PageRequest.of(page, size)));
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -56,5 +57,12 @@ public class SessioneController {
                                                                @Parameter(description = "Numero di elementi richiesti")
                                                                @PathVariable @Min(1) int size) {
         return ResponseEntity.ok(service.search(request, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/{id}/iscrizione")
+    @Operation(summary = "Iscrive lo studente alla sessione")
+    @PreAuthorizeStudente
+    public ResponseEntity<SessioneDTO> iscrivi(@Parameter(description = "Id della sessione") @PathVariable @Min(1) Integer id) {
+        return ResponseEntity.ok(service.iscrivi(id));
     }
 }

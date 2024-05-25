@@ -83,7 +83,16 @@ public class CorsoServiceImpl implements CorsoService{
     }
 
     @Override
-    public List<CorsoDTO> getCorsiByStudente(String email) {
+    public List<CorsoDTO> getCorsiByStudente(String mail) {
+        String email;
+        if(mail == null){
+            final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+            email = details.username();
+        } else {
+            email = mail;
+        }
+
         return dao.findByStudenti_EmailIgnoreCase(email).stream().map(c -> new CorsoDTO(null, c.getNome(), null, null, null, null, null)).collect(Collectors.toList());
     }
 
@@ -138,12 +147,13 @@ public class CorsoServiceImpl implements CorsoService{
     }
     private CorsoSummaryDTO mapToResponse(final CorsoSummaryEntity entity){
 
+        final Integer id = entity.getIdCorso();
         final String nomeCorso = entity.getNomeCorso();
         final Integer moduli = entity.getNumeroModuli();
         final Integer sessioni = entity.getNumeroSessioni();
         final Integer studenti = entity.getNumeroStudenti();
 
-        return new CorsoSummaryDTO(nomeCorso,moduli,sessioni,studenti);
+        return new CorsoSummaryDTO(id,nomeCorso,moduli,sessioni,studenti);
     }
 
 }

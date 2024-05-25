@@ -17,7 +17,11 @@ import org.hibernate.annotations.Immutable;
 @Immutable
 @Table(name = "\"VCRSM_CORSO_SUMMARY\"")
 public class CorsoSummaryEntity {
+
     @Id
+    @Column(name = "\"ID_CORSO\"")
+    private Integer idCorso;
+
     @Column(name = "\"NOME_CORSO\"", length = Integer.MAX_VALUE)
     private String nomeCorso;
 

@@ -78,6 +78,12 @@ public class CorsoController {
         return ResponseEntity.ok(service.getCorsiByStudente(email));
     }
 
+    @GetMapping("/list/studente")
+    @Operation(summary = "Restituisce i corsi afferenti allo studente")
+    public ResponseEntity<List<CorsoDTO>> getCorsiByStudente() {
+        return ResponseEntity.ok(service.getCorsiByStudente(null));
+    }
+
     @PostMapping
     @Operation(summary = "Crea un corso")
     @PreAuthorizeAdmin
