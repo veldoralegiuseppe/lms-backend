@@ -9,6 +9,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -48,5 +50,8 @@ public class DocumentaleEntity {
     @Column(name = "\"DDOCU_UPDATE_DATE\"", nullable = false)
     @UpdateTimestamp
     private ZonedDateTime updateDate;
+
+    @OneToMany(mappedBy = "provaScritta")
+    private Set<IstanzaSessioneEntity> proveEsame = new LinkedHashSet<>();
 
 }

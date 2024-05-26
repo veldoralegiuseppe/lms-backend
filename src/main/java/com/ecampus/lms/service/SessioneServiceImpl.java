@@ -3,6 +3,7 @@ package com.ecampus.lms.service;
 import com.ecampus.lms.dao.*;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
+import com.ecampus.lms.dto.request.UpdateEsitoRequest;
 import com.ecampus.lms.dto.response.*;
 import com.ecampus.lms.entity.*;
 import com.ecampus.lms.entity.key.IstanzaSessioneEntityId;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -118,15 +120,40 @@ public class SessioneServiceImpl implements SessioneService{
     public SessioneDetailsResponse detail(Integer id) {
         final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
-        final String email = details.username().toUpperCase();
+        final String email = details.username();
         final UserRole role = details.role();
 
         switch (role){
-            case DOCENTE -> {return mapToDetailsResponse(dao.getSessionDetails(id), id);}
-            case STUDENTE -> {return null;}
-            case ADMIN -> {return null;}
+            case DOCENTE, STUDENTE, ADMIN -> {return mapToDetailsResponse(dao.getSessionDetails(id, role.name(), email), id);}
             default -> {return null;}
         }
+    }
+
+    @Override
+    public void updateEsiti(List<UpdateEsitoRequest> esiti) {
+        esiti.forEach(request -> {
+            final IstanzaSessioneEntityId idIstanza = new IstanzaSessioneEntityId();
+            idIstanza.setIdSessione(request.idSessione());
+            idIstanza.setIdStudente(request.idStudente());
+
+            istanzaSessioneDAO.updateEsito(request.esito(), List.of(idIstanza));
+        });
+    }
+
+    @Override
+    @Transactional
+    public void uploadEsameStudente(Integer idSessione, MultipartFile file) throws IOException {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username();
+        final UserRole role = details.role();
+
+       final IstanzaSessioneEntity istanza = istanzaSessioneDAO.findIstanzaSessione(idSessione, email)
+               .orElseThrow(() -> new EntityNotFoundException("Istanza della sessione con id: '"+ idSessione + "' per l'utente: '" + email + "' non trovata"));
+
+       final DocumentaleEntity esame = documentaleService.store(file);
+
+       istanzaSessioneDAO.updateProvaScritta(esame, istanza.getId());
     }
 
     /*Utility methods*/
@@ -185,6 +212,9 @@ public class SessioneServiceImpl implements SessioneService{
         final Integer idCorso = tupla.get("ID_CORSO", Integer.class);
         final Integer numeroIscritti = tupla.get("NUMERO_ISCRITTI", Integer.class);
         final LocalDate dataSessione = tupla.get("DATA_SESSIONE", LocalDate.class);
+        final String nomeProvaSomministrata = tupla.get("NOME_PROVA_SOMMINISTRATA", String.class);
+        final String contentTypeProvaSomministrata = tupla.get("CONTENT_TYPE_PROVA_SOMMINISTRATA", String.class);
+
 
         final List<IstanzaSessioneDTO> esami = tuple.stream().map(t -> {
             final String nomeStudente = t.get("NOME_STUDENTE", String.class);
@@ -194,11 +224,14 @@ public class SessioneServiceImpl implements SessioneService{
             final String idFileStudente = t.get("ID_PROVA_STUDENTE", String.class);
             final String codiceFiscaleStudente = t.get("CODICE_FISCALE_STUDENTE", String.class);
             final String nomeFileStudente = t.get("NOME_PROVA_STUDENTE", String.class);
+            final String esito = t.get("ESITO_STUDENTE", String.class);
+            final String contentType = t.get("CONTENT_TYPE_PROVA_STUDENTE", String.class);
 
-           return new IstanzaSessioneDTO(idSessione, idStudente,nomeStudente,cognomeStudente,codiceFiscaleStudente,emailStudente,idFileStudente,nomeFileStudente);
+
+            return new IstanzaSessioneDTO(idSessione, idStudente,nomeStudente,cognomeStudente,codiceFiscaleStudente,emailStudente,idFileStudente,nomeFileStudente,contentType,esito);
         }).collect(Collectors.toList());
 
-        return new SessioneDetailsResponse(idCorso,idDocente,nomeDocente,cognomeDocente,emailDocente,nomeCorso,idSessione,tipoSessione,dataSessione,numeroIscritti,idProvaSomministrata,esami);
+        return new SessioneDetailsResponse(idCorso,idDocente,nomeDocente,cognomeDocente,emailDocente,nomeCorso,idSessione,tipoSessione,dataSessione,numeroIscritti,idProvaSomministrata,nomeProvaSomministrata,contentTypeProvaSomministrata,esami);
     }
 
 }

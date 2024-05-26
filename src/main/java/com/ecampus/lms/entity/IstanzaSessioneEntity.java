@@ -28,6 +28,6 @@ public class IstanzaSessioneEntity {
     private DocumentaleEntity provaScritta;
 
     @Column(name = "\"RSEST_ESITO\"")
-    private Integer esito;
+    private String esito;
 
 }

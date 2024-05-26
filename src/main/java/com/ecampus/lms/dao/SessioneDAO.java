@@ -13,11 +13,12 @@ public interface SessioneDAO extends JpaRepository<SessioneEntity, Integer> {
     select distinct
     c.nome as NOME_CORSO, c.id AS ID_CORSO,
     d.id AS ID_DOCENTE, d.nome AS NOME_DOCENTE, d.cognome AS COGNOME_DOCENTE, d.email AS EMAIL_DOCENTE,
-    s.nome as NOME_STUDENTE, s.cognome as COGNOME_STUDENTE, s.email as EMAIL_STUDENTE, s.id AS ID_STUDENTE, s.codiceFiscale as CODICE_FISCALE_STUDENTE,
-    se.tipo as TIPO_SESSIONE, se.data AS DATA_SESSIONE,
-    pr.id as ID_PROVA_SOMMINISTRATA,
+    s.nome as NOME_STUDENTE, s.cognome as COGNOME_STUDENTE, s.email as EMAIL_STUDENTE, s.id AS ID_STUDENTE, s.codiceFiscale as CODICE_FISCALE_STUDENTE, 
+    se.tipo as TIPO_SESSIONE, se.data AS DATA_SESSIONE, 
+    pr.id as ID_PROVA_SOMMINISTRATA, pr.nome as NOME_PROVA_SOMMINISTRATA, pr.tipo as CONTENT_TYPE_PROVA_SOMMINISTRATA,
     sm.numeroIscritti as NUMERO_ISCRITTI,
-    f.id as ID_PROVA_STUDENTE, f.nome as NOME_PROVA_STUDENTE
+    f.id as ID_PROVA_STUDENTE, f.nome as NOME_PROVA_STUDENTE, f.tipo as CONTENT_TYPE_PROVA_STUDENTE,
+    i.esito AS ESITO_STUDENTE
     from IstanzaSessioneEntity i 
     left join i.provaScritta f
     join i.sessione se
@@ -26,7 +27,8 @@ public interface SessioneDAO extends JpaRepository<SessioneEntity, Integer> {
     join i.studente s 
     join se.corso c 
     join c.docente d
-    where se.id = :id
+    where se.id = :id and
+    (:role != 'STUDENTE' or s.email = :email)
     """)
-    List<Tuple> getSessionDetails(@Param("id") Integer id);
+    List<Tuple> getSessionDetails(@Param("id") Integer id, @Param("role") String ruolo, @Param("email") String email);
 }

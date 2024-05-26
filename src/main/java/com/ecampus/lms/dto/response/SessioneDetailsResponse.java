@@ -18,5 +18,7 @@ public record SessioneDetailsResponse(@NotNull Integer idCorso,
                                       @NotNull @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy") LocalDate dataSessione,
                                       @NotNull Integer numeroIscritti,
                                       @NotBlank String idProvaSomministrata,
+                                      @NotBlank String nomeProvaSomministrata,
+                                      @NotBlank String contentType,
                                       List<IstanzaSessioneDTO> esami) {
 }

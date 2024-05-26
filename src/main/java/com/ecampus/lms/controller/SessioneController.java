@@ -2,10 +2,12 @@ package com.ecampus.lms.controller;
 
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
+import com.ecampus.lms.dto.request.UpdateEsitoRequest;
 import com.ecampus.lms.dto.response.MessageDTO;
 import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDetailsResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
+import com.ecampus.lms.entity.key.IstanzaSessioneEntityId;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
 import com.ecampus.lms.security.PreAuthorizeStudente;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sessione")
@@ -71,6 +75,22 @@ public class SessioneController {
     @Operation(summary = "Dettaglio dellla sessione")
     public ResponseEntity<SessioneDetailsResponse> detail(@Parameter(description = "Id della sessione") @PathVariable @Min(1) Integer id) {
         return ResponseEntity.ok(service.detail(id));
+    }
+
+    @PostMapping("/update/esito")
+    @Operation(summary = "Update voti degli studenti")
+    public ResponseEntity<Void> updateEsiti(@Parameter(description = "Map esito-istanza sessione")
+                                            @RequestBody List<UpdateEsitoRequest> esiti){
+        service.updateEsiti(esiti);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/upload/esame", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Upload")
+    @PreAuthorizeStudente
+    public ResponseEntity<Void> uploadEsameStudente(@RequestPart("idSessione") Integer idSessione, @RequestPart("file") MultipartFile file) throws IOException {
+        service.uploadEsameStudente(idSessione, file);
+        return ResponseEntity.ok().build();
     }
 
 }
