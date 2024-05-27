@@ -41,4 +41,10 @@ public class SessioneSummaryEntity {
     @Column(name = "\"NUMERO_ISCRITTI\"")
     private Integer numeroIscritti;
 
+    @Column(name = "\"PROVE_CONSEGNATE\"")
+    private Integer proveConsegnate;
+
+    @Column(name = "\"PROVE_CORRETTE\"")
+    private Integer proveCorrette;
+
 }

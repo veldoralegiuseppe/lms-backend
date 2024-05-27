@@ -42,13 +42,13 @@ public class SessioneServiceImpl implements SessioneService{
     private final IstanzaSessioneDAO istanzaSessioneDAO;
 
     @Override
-    public Page<SearchSessioneResponse> getSummary(Pageable pageable) {
+    public Page<SearchSessioneResponse> getSummary(Pageable pageable, Boolean corrette) {
         final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
         final String email = details.username().toUpperCase();
         final UserRole role = details.role();
 
-        return sessioneSummaryDAO.getSummary(email, role.name(), null, null, LocalDate.now(), null, pageable).map(this::mapToSearchResponse);
+        return sessioneSummaryDAO.getSummary(email, corrette, role.name(),  null, null, LocalDate.now(), null, pageable).map(this::mapToSearchResponse);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SessioneServiceImpl implements SessioneService{
 
         switch(role){
             case STUDENTE -> {return sessioneSummaryDAO.searchStudente(email, corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);}
-            default -> {return sessioneSummaryDAO.getSummary(email, role.name(), corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);}
+            default -> {return sessioneSummaryDAO.getSummary(email, null, role.name(), corso, tipo, dataDa, dataA, pageable).map(this::mapToSearchResponse);}
         }
 
     }
@@ -195,8 +195,11 @@ public class SessioneServiceImpl implements SessioneService{
         final LocalDate data = entity.getDataSessione();
         final String tipo = entity.getTipoSessione();
         final Integer numeroStudenti = entity.getNumeroIscritti();
+        final Integer proveConsegnate = entity.getProveConsegnate();
+        final Integer proveCorrette = entity.getProveCorrette();
 
-        return new SearchSessioneResponse(idSessione, idCorso, nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti);
+
+        return new SearchSessioneResponse(idSessione, idCorso, nomeCorso, data, tipo, nomeDocente, cognomeDocente, emailDocente, numeroStudenti, proveConsegnate, proveCorrette);
 
     }
     private SessioneDetailsResponse mapToDetailsResponse(List<Tuple> tuple, Integer idSessione){

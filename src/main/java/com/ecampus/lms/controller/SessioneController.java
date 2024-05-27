@@ -5,9 +5,8 @@ import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.request.UpdateEsitoRequest;
 import com.ecampus.lms.dto.response.MessageDTO;
 import com.ecampus.lms.dto.response.SearchSessioneResponse;
-import com.ecampus.lms.dto.response.SessioneDetailsResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
-import com.ecampus.lms.entity.key.IstanzaSessioneEntityId;
+import com.ecampus.lms.dto.response.SessioneDetailsResponse;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
 import com.ecampus.lms.security.PreAuthorizeStudente;
@@ -26,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sessione")
@@ -40,10 +38,11 @@ public class SessioneController {
     @GetMapping("/{size}/{page}")
     @Operation(summary = "Restituisce il riepilogo delle sessioni relative all'utente")
     public ResponseEntity<Page<SearchSessioneResponse>> getSummary(@Parameter(description = "Numero di pagina richiesto")
-                                                         @PathVariable @Min(0) int page,
-                                                         @Parameter(description = "Numero di elementi richiesti")
-                                                         @PathVariable @Min(1) int size) {
-        return ResponseEntity.ok(service.getSummary(PageRequest.of(page, size)));
+                                                                   @PathVariable @Min(0) int page,
+                                                                   @Parameter(description = "Numero di elementi richiesti")
+                                                                   @PathVariable @Min(1) int size,
+                                                                   @RequestParam(required = false) Boolean corrette) {
+        return ResponseEntity.ok(service.getSummary(PageRequest.of(page, size), corrette));
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -80,7 +79,7 @@ public class SessioneController {
     @PostMapping("/update/esito")
     @Operation(summary = "Update voti degli studenti")
     public ResponseEntity<Void> updateEsiti(@Parameter(description = "Map esito-istanza sessione")
-                                            @RequestBody List<UpdateEsitoRequest> esiti){
+                                            @RequestBody List<UpdateEsitoRequest> esiti) {
         service.updateEsiti(esiti);
         return ResponseEntity.ok().build();
     }

@@ -14,16 +14,20 @@ import java.time.LocalDate;
 public interface SessioneSummaryDAO extends JpaRepository<SessioneSummaryEntity, SessioneSummaryEntityId> {
     @Query("""
     select s AS SUMMARY, d.email AS EMAIL_DOCENTE, d.nome AS NOME_DOCENTE, d.cognome AS COGNOME_DOCENTE
-    from SessioneSummaryEntity s join CorsoEntity c on c.id = s.id.idCorso join c.docente d
+    from SessioneSummaryEntity s 
+    join CorsoEntity c on c.id = s.id.idCorso 
+    join c.docente d
     where 
         (:ruolo != 'DOCENTE' or upper(s.email) = :email) AND
+        (:ruolo != 'DOCENTE' or :corrette is null or :corrette = true or s.numeroIscritti > 0 and s.proveCorrette < s.proveConsegnate) AND
+        (:ruolo != 'DOCENTE' or :corrette is null or :corrette = false or s.numeroIscritti > 0 and s.proveCorrette = s.proveConsegnate) AND
         (:ruolo != 'STUDENTE' or :email = upper(s.email)) AND
         (:nomeCorso is null or upper(s.nomeCorso) = :nomeCorso) AND
         (:tipo is null or upper(s.tipoSessione) = :tipo) AND
         (cast(:dataDa as date) is null or s.dataSessione >= :dataDa) AND 
         (cast(:dataA as date) is null or s.dataSessione <= :dataA )    
     """)
-    Page<Tuple> getSummary(@Param("email") String email, @Param("ruolo") String ruolo, @Param("nomeCorso") String nomeCorso, @Param("tipo") String tipo, @Param("dataDa") LocalDate dataDa, @Param("dataA") LocalDate dataA, Pageable pageable);
+    Page<Tuple> getSummary(@Param("email") String email, @Param("corrette") Boolean corrette, @Param("ruolo") String ruolo, @Param("nomeCorso") String nomeCorso, @Param("tipo") String tipo, @Param("dataDa") LocalDate dataDa, @Param("dataA") LocalDate dataA, Pageable pageable);
 
     @Query("""
     select vse AS SUMMARY, d.email AS EMAIL_DOCENTE, d.nome AS NOME_DOCENTE, d.cognome AS COGNOME_DOCENTE

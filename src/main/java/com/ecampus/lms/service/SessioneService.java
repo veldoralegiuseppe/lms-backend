@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface SessioneService {
-    Page<SearchSessioneResponse> getSummary(Pageable pageable);
+    Page<SearchSessioneResponse> getSummary(Pageable pageable, Boolean corrette);
     void create(SessioneRequest sessione, MultipartFile file) throws IOException;
     SessioneDTO get(Integer id);
     Page<SearchSessioneResponse> search(SearchSessioneRequest request, Pageable pageable);

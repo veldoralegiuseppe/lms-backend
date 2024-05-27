@@ -14,5 +14,7 @@ public record SearchSessioneResponse(@NotNull Integer idSessione,
                                      @NotBlank String nomeDocente,
                                      @NotBlank String cognomeDocente,
                                      @NotBlank String emailDocente,
-                                     Integer numeroStudenti) {
+                                     Integer numeroStudenti,
+                                     Integer proveConsegnate,
+                                     Integer proveCorrette) {
 }
