@@ -1,8 +1,10 @@
 package com.ecampus.lms.service;
 
+import com.ecampus.lms.dto.request.SearchProgressiRequest;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.request.UpdateEsitoRequest;
+import com.ecampus.lms.dto.response.SearchProgressiResponse;
 import com.ecampus.lms.dto.response.SearchSessioneResponse;
 import com.ecampus.lms.dto.response.SessioneDetailsResponse;
 import com.ecampus.lms.dto.response.SessioneDTO;
@@ -25,4 +27,5 @@ public interface SessioneService {
     SessioneDetailsResponse detail(Integer id);
     void updateEsiti(List<UpdateEsitoRequest> esiti);
     void uploadEsameStudente(Integer idSessione, MultipartFile file) throws IOException;
+    Page<SearchProgressiResponse> searchProgressi(SearchProgressiRequest request, Pageable pageable);
 }

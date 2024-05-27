@@ -42,4 +42,32 @@ public interface SessioneSummaryDAO extends JpaRepository<SessioneSummaryEntity,
     """)
     Page<Tuple> searchStudente(@Param("email") String email, @Param("nomeCorso") String nomeCorso, @Param("tipo") String tipo, @Param("dataDa") LocalDate dataDa, @Param("dataA") LocalDate dataA, Pageable pageable);
 
+    @Query("""
+    select distinct s as SUMMARY, 
+    i.esito as ESITO, 
+    u.codiceFiscale as CODICE_FISCALE, u.nome as NOME, u.cognome as COGNOME
+    from SessioneSummaryEntity s
+    join IstanzaSessioneEntity i on i.id.idSessione = s.id.idSessione
+    join UtenteEntity u on s.id.idUtente = u.id
+    where 
+        (s.ruolo = 'STUDENTE') AND
+        (:email is null or s.email = :email) AND 
+        (:nome is null or upper(u.nome) = :nome) AND
+        (:cognome is null or upper(u.cognome) = :cognome) AND
+        (:cf is null or upper(u.codiceFiscale) = :cf) AND
+        (:nomeCorso is null or upper(s.nomeCorso) = :nomeCorso) AND
+        (:tipoSessione is null or upper(s.tipoSessione) = :tipoSessione) AND
+        (cast(:dataDa as date) is null or s.dataSessione >= :dataDa) AND 
+        (cast(:dataA as date) is null or s.dataSessione <= :dataA ) 
+    """)
+    Page<Tuple> searchProgressi(@Param("email") String email,
+                                @Param("nome") String nome,
+                                @Param("cognome") String cognome,
+                                @Param("cf") String codiceFiscale,
+                                @Param("nomeCorso") String nomeCorso,
+                                @Param("tipoSessione") String tipoSessione,
+                                @Param("dataDa") LocalDate dataDa,
+                                @Param("dataA") LocalDate dataA,
+                                Pageable pageable);
+
 }

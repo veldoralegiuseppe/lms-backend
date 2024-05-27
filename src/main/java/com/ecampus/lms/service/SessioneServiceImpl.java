@@ -1,6 +1,7 @@
 package com.ecampus.lms.service;
 
 import com.ecampus.lms.dao.*;
+import com.ecampus.lms.dto.request.SearchProgressiRequest;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.request.UpdateEsitoRequest;
@@ -156,6 +157,27 @@ public class SessioneServiceImpl implements SessioneService{
        istanzaSessioneDAO.updateProvaScritta(esame, istanza.getId());
     }
 
+    @Override
+    public Page<SearchProgressiResponse> searchProgressi(SearchProgressiRequest request, Pageable pageable) {
+        final UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SecurityContextDetails details = (SecurityContextDetails) authentication.getDetails();
+        final String email = details.username();
+        final UserRole role = details.role();
+
+        final String nome = request.nome() != null ? request.nome().toUpperCase() : null;
+        final String cognome = request.cognome() != null ? request.cognome().toUpperCase() : null;
+        final String codiceFiscale = request.codiceFiscale() != null ? request.codiceFiscale().toUpperCase() : null;
+        final String tipoSessione = request.tipoSessione() != null ? request.tipoSessione().toUpperCase() : null;
+        final String nomeCorso = request.nomeCorso() != null ? request.nomeCorso().toUpperCase() : null;
+
+        switch(role){
+            case STUDENTE -> {return sessioneSummaryDAO.searchProgressi(email, nome, cognome, codiceFiscale, nomeCorso, tipoSessione, request.dataDa(), request.dataA(), pageable).map(this::matToSearchProgressiResponse);}
+            case ADMIN,DOCENTE -> {return sessioneSummaryDAO.searchProgressi(null, nome, cognome, codiceFiscale, nomeCorso, tipoSessione, request.dataDa(), request.dataA(), pageable).map(this::matToSearchProgressiResponse);}
+            default -> {return null;}
+        }
+
+    }
+
     /*Utility methods*/
     private SessioneDTO mapToResponse(SessioneEntity entity){
         final String dateTimePattern = "dd/mm/yyyy";
@@ -235,6 +257,16 @@ public class SessioneServiceImpl implements SessioneService{
         }).collect(Collectors.toList());
 
         return new SessioneDetailsResponse(idCorso,idDocente,nomeDocente,cognomeDocente,emailDocente,nomeCorso,idSessione,tipoSessione,dataSessione,numeroIscritti,idProvaSomministrata,nomeProvaSomministrata,contentTypeProvaSomministrata,esami);
+    }
+    private SearchProgressiResponse matToSearchProgressiResponse(Tuple tuple){
+        final SessioneSummaryEntity entity = tuple.get("SUMMARY", SessioneSummaryEntity.class);
+        final String nome = tuple.get("NOME", String.class);
+        final String cognome = tuple.get("COGNOME", String.class);
+        final String codiceFiscale = tuple.get("CODICE_FISCALE", String.class);
+        final String esito = tuple.get("ESITO", String.class);
+
+
+        return new SearchProgressiResponse(nome,cognome,codiceFiscale,entity.getNomeCorso(),esito,entity.getTipoSessione(),entity.getDataSessione());
     }
 
 }

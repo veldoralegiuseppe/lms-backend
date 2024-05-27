@@ -1,12 +1,10 @@
 package com.ecampus.lms.controller;
 
+import com.ecampus.lms.dto.request.SearchProgressiRequest;
 import com.ecampus.lms.dto.request.SearchSessioneRequest;
 import com.ecampus.lms.dto.request.SessioneRequest;
 import com.ecampus.lms.dto.request.UpdateEsitoRequest;
-import com.ecampus.lms.dto.response.MessageDTO;
-import com.ecampus.lms.dto.response.SearchSessioneResponse;
-import com.ecampus.lms.dto.response.SessioneDTO;
-import com.ecampus.lms.dto.response.SessioneDetailsResponse;
+import com.ecampus.lms.dto.response.*;
 import com.ecampus.lms.security.PreAuthorizeAll;
 import com.ecampus.lms.security.PreAuthorizeDocente;
 import com.ecampus.lms.security.PreAuthorizeStudente;
@@ -90,6 +88,16 @@ public class SessioneController {
     public ResponseEntity<Void> uploadEsameStudente(@RequestPart("idSessione") Integer idSessione, @RequestPart("file") MultipartFile file) throws IOException {
         service.uploadEsameStudente(idSessione, file);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/progressi/{size}/{page}")
+    @Operation(summary = "Restituisce il riepilogo dei progressi in base ai filtri")
+    public ResponseEntity<Page<SearchProgressiResponse>> searchProgressi(@RequestBody SearchProgressiRequest request,
+                                                                   @Parameter(description = "Numero di pagina richiesto")
+                                                                   @PathVariable @Min(0) int page,
+                                                                   @Parameter(description = "Numero di elementi richiesti")
+                                                                   @PathVariable @Min(1) int size) {
+        return ResponseEntity.ok(service.searchProgressi(request, PageRequest.of(page, size)));
     }
 
 }
